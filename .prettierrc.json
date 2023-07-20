@@ -1,0 +1,10 @@
+{
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "semi": true,
+  "singleQuote": true,
+  "printWidth": 120,
+  "importOrderSeparation": false,
+  "importOrderSortSpecifiers": true,
+  "importOrder": ["^(react)$", "^(next)", "^(@supabase)", "<THIRD_PARTY_MODULES>", "^(@/)", "^(./)", "^(../)"]
+}
