@@ -385,7 +385,6 @@ FodyWeavers.xsd
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-*.code-workspace
 
 # Local History for Visual Studio Code
 .history/
@@ -492,5 +491,4 @@ dist-ssr
 .idea
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
