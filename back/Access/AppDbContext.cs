@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TV_IDP.Access.Model;
+using TV_IDP.Access.Models;
 
 namespace TV_IDP.Access
 {
@@ -7,6 +7,6 @@ namespace TV_IDP.Access
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<Post> Posts { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
