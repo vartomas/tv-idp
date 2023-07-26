@@ -15,9 +15,9 @@ public interface IJwtUtils
 
 public class JwtUtils : IJwtUtils
 {
-    private readonly AppSettings _appSettings;
+    private readonly JwtSettings _appSettings;
 
-    public JwtUtils(IOptions<AppSettings> appSettings)
+    public JwtUtils(IOptions<JwtSettings> appSettings)
     {
         _appSettings = appSettings.Value;
 
@@ -27,7 +27,6 @@ public class JwtUtils : IJwtUtils
 
     public string GenerateJwtToken(User user)
     {
-        // generate token that is valid for 7 days
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_appSettings.Secret!);
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -62,12 +61,10 @@ public class JwtUtils : IJwtUtils
             var jwtToken = (JwtSecurityToken)validatedToken;
             var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
 
-            // return user id from JWT token if validation successful
             return userId;
         }
         catch
         {
-            // return null if validation fails
             return null;
         }
     }

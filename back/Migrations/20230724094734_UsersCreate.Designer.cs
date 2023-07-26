@@ -11,8 +11,8 @@ using TV_IDP.Services;
 namespace TV_IDP.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230720144424_AddIsPublishedToPost")]
-    partial class AddIsPublishedToPost
+    [Migration("20230724094734_UsersCreate")]
+    partial class UsersCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,7 +24,7 @@ namespace TV_IDP.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("TV_IDP.Access.Model.Post", b =>
+            modelBuilder.Entity("TV_IDP.Access.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,20 +32,17 @@ namespace TV_IDP.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Body")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Title")
+                    b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Users");
                 });
 #pragma warning restore 612, 618
         }

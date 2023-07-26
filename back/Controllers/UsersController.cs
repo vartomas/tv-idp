@@ -20,14 +20,19 @@ public class UsersController : ControllerBase
     [HttpPost(nameof(Register))]
     public IActionResult Register(UserDto request)
     {
-        string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
         var response = _userService.Create(request);
-
         if (response == null)
+        {
             return BadRequest(new { message = "Username already exists" });
+        }
 
-        return Ok(response);
+        var option = new CookieOptions
+        {
+            Expires = DateTime.Now.AddDays(7)
+        };
+        Response.Cookies.Append("token", response.Token, option);
+
+        return Ok(new { response.Id, response.Username });
     }
 
     [AllowAnonymous]
@@ -35,10 +40,15 @@ public class UsersController : ControllerBase
     public IActionResult Login(UserDto request)
     {
         var response = _userService.LogIn(request);
-
         if (response == null)
             return BadRequest(new { message = "Username or password is incorrect" });
 
-        return Ok(response);
+        var option = new CookieOptions
+        {
+            Expires = DateTime.Now.AddDays(7)
+        };
+        Response.Cookies.Append("token", response.Token, option);
+
+        return Ok(new { response.Id, response.Username });
     }
 }

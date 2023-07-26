@@ -1,16 +1,17 @@
 ﻿namespace TV_IDP.Services;
 
-using Microsoft.EntityFrameworkCore;
-using TV_IDP.Access;
+using Azure;
+using Azure.Core;
+using Microsoft.Net.Http.Headers;
+using System.Net;
 using TV_IDP.Access.Models;
 using TV_IDP.Authorization;
 using TV_IDP.Models;
 
 public interface IUserService
 {
-    AuthenticateResponse? LogIn(UserDto model);
-    AuthenticateResponse? Create(UserDto model);
-    IEnumerable<User> GetAll();
+    AuthenticateResponse? LogIn(UserDto request);
+    AuthenticateResponse? Create(UserDto request);
     User? GetById(int id);
 }
 
@@ -25,33 +26,31 @@ public class UserService : IUserService
         _jwtUtils = jwtUtils;
     }
 
-    public AuthenticateResponse? LogIn(UserDto model)
+    public AuthenticateResponse? LogIn(UserDto request)
     {
-        var user = _context.Users.Find(model.Username);
+        var user = _context.Users.FirstOrDefault(user => user.Username == request.Username);
         if (user == null) return null;
+        var passwordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
+        if (!passwordValid) return null;
         var token = _jwtUtils.GenerateJwtToken(user);
+
         return new AuthenticateResponse(user, token);
     }
 
-    public AuthenticateResponse? Create(UserDto model)
+    public AuthenticateResponse? Create(UserDto request)
     {
-        var user = _context.Users.Find(model.Username);
-        if (user != null) return null;
-        user = new User
+        var foundUser = _context.Users.FirstOrDefault(user => user.Username == request.Username);
+        if (foundUser != null) return null;
+        var user = new User
         {
-            Username = model.Username,
-            Password = BCrypt.Net.BCrypt.HashPassword(model.Password)
+            Username = request.Username,
+            Password = BCrypt.Net.BCrypt.HashPassword(request.Password)
         };
 
         _context.Users.Add(user);
         _context.SaveChanges();
         var token = _jwtUtils.GenerateJwtToken(user);
         return new AuthenticateResponse(user, token);
-    }
-
-    public IEnumerable<User> GetAll()
-    {
-        return _context.Users;
     }
 
     public User? GetById(int id)

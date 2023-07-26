@@ -12,11 +12,10 @@ public class JwtMiddleware
 
     public async Task Invoke(HttpContext context, IUserService userService, IJwtUtils jwtUtils)
     {
-        var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        var token = context.Request.Cookies["token"];
         var userId = jwtUtils.ValidateJwtToken(token);
         if (userId != null)
         {
-            // attach user to context on successful jwt validation
             context.Items["User"] = userService.GetById(userId.Value);
         }
 

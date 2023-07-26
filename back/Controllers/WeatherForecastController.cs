@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using TV_IDP.Authorization;
 
 namespace TV_IDP.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class WeatherForecastController : ControllerBase
     {
