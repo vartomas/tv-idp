@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TV_IDP.Authorization;
 using TV_IDP.Services;
 using TV_IDP.Models;
+using TV_IDP.Access.Models;
 
 [ApiController]
 [Authorize]
@@ -50,5 +51,21 @@ public class UsersController : ControllerBase
         Response.Cookies.Append("token", response.Token, option);
 
         return Ok(new { response.Id, response.Username });
+    }
+
+    [HttpGet(nameof(Check))]
+    public IActionResult Check()
+    {
+        var user = HttpContext.Items["User"];
+        var res = new
+        { ((User)user!).Id, ((User)user!).Username };
+        return Ok(res);
+    }
+
+    [HttpPost(nameof(Logout))]
+    public IActionResult Logout()
+    {
+        Response.Cookies.Delete("token");
+        return Ok();
     }
 }

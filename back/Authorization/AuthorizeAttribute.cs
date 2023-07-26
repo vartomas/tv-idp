@@ -16,6 +16,7 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
         if (user == null)
         {
             context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            context.HttpContext.Response.Cookies.Delete("token");
         }
     }
 }

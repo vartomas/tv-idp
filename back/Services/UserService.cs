@@ -1,9 +1,4 @@
 ﻿namespace TV_IDP.Services;
-
-using Azure;
-using Azure.Core;
-using Microsoft.Net.Http.Headers;
-using System.Net;
 using TV_IDP.Access.Models;
 using TV_IDP.Authorization;
 using TV_IDP.Models;
