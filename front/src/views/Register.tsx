@@ -16,11 +16,11 @@ const loginSchema = object({
     .required('Repeat password required')
     .oneOf([ref('password')], 'Passwords must match'),
 });
-type LoginForm = InferType<typeof loginSchema>;
+type RegisterForm = InferType<typeof loginSchema>;
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-  const { control, handleSubmit } = useForm<LoginForm>({
+  const { control, handleSubmit } = useForm<RegisterForm>({
     mode: 'onSubmit',
     defaultValues: { username: '', password: '', repeatPassword: '' },
     resolver: yupResolver(loginSchema),
