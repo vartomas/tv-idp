@@ -61,11 +61,4 @@ public class UsersController : ControllerBase
         { ((User)user!).Id, ((User)user!).Username };
         return Ok(res);
     }
-
-    [HttpPost(nameof(Logout))]
-    public IActionResult Logout()
-    {
-        Response.Cookies.Delete("token");
-        return Ok();
-    }
 }
