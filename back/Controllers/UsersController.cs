@@ -19,9 +19,9 @@ public class UsersController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost(nameof(Register))]
-    public IActionResult Register(UserDto request)
+    public async Task<IActionResult> Register(UserDto request)
     {
-        var response = _userService.Create(request);
+        var response = await _userService.Create(request);
         if (response == null)
         {
             return BadRequest(new { message = "Username already exists" });
@@ -38,9 +38,9 @@ public class UsersController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost(nameof(Login))]
-    public IActionResult Login(UserDto request)
+    public async Task<IActionResult> Login(UserDto request)
     {
-        var response = _userService.LogIn(request);
+        var response = await _userService.LogIn(request);
         if (response == null)
             return BadRequest(new { message = "Username or password is incorrect" });
 

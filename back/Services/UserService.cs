@@ -1,13 +1,15 @@
 ﻿namespace TV_IDP.Services;
+
+using Microsoft.EntityFrameworkCore;
 using TV_IDP.Access.Models;
 using TV_IDP.Authorization;
 using TV_IDP.Models;
 
 public interface IUserService
 {
-    AuthenticateResponse? LogIn(UserDto request);
-    AuthenticateResponse? Create(UserDto request);
-    User? GetById(int id);
+    Task<AuthenticateResponse?> LogIn(UserDto request);
+    Task<AuthenticateResponse?> Create(UserDto request);
+    Task<User?> GetById(int id);
 }
 
 public class UserService : IUserService
@@ -21,9 +23,9 @@ public class UserService : IUserService
         _jwtUtils = jwtUtils;
     }
 
-    public AuthenticateResponse? LogIn(UserDto request)
+    public async Task<AuthenticateResponse?> LogIn(UserDto request)
     {
-        var user = _context.Users.FirstOrDefault(user => user.Username == request.Username);
+        var user = await _context.Users.FirstOrDefaultAsync(user => user.Username == request.Username);
         if (user == null) return null;
         var passwordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
         if (!passwordValid) return null;
@@ -32,9 +34,9 @@ public class UserService : IUserService
         return new AuthenticateResponse(user, token);
     }
 
-    public AuthenticateResponse? Create(UserDto request)
+    public async Task<AuthenticateResponse?> Create(UserDto request)
     {
-        var foundUser = _context.Users.FirstOrDefault(user => user.Username == request.Username);
+        var foundUser = await _context.Users.FirstOrDefaultAsync(user => user.Username == request.Username);
         if (foundUser != null) return null;
         var user = new User
         {
@@ -42,14 +44,14 @@ public class UserService : IUserService
             Password = BCrypt.Net.BCrypt.HashPassword(request.Password)
         };
 
-        _context.Users.Add(user);
-        _context.SaveChanges();
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
         var token = _jwtUtils.GenerateJwtToken(user);
         return new AuthenticateResponse(user, token);
     }
 
-    public User? GetById(int id)
+    public async Task<User?> GetById(int id)
     {
-        return _context.Users.Find(id);
+        return await _context.Users.FindAsync(id);
     }
 }
