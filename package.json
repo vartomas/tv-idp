@@ -1,0 +1,21 @@
+{
+  "name": "tv-idp",
+  "version": "1.0.0",
+  "description": "IDP",
+  "main": "index.js",
+  "scripts": {
+    "api": "cd back && dotnet watch run --launch-profile https",
+    "ui": "cd front && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vartomas/tv-idp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vartomas/tv-idp/issues"
+  },
+  "homepage": "https://github.com/vartomas/tv-idp#readme"
+}
