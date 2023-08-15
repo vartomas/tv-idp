@@ -67,5 +67,5 @@ jobs:
         with:
           app-name: 'tv-app-idp'
           slot-name: 'production'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_8c5bf2786e864add9dd77f3eabc23d97 }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: .
