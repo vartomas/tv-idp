@@ -5,6 +5,15 @@ export const useApi = () => {
 
   const call = async <T = undefined>(fn: (...args: unknown[]) => Promise<Response>, notifyErrors = false) => {
     const response = await fn();
+
+    if (response.status === 500) {
+      if (notifyErrors) {
+        notifyError('Something went wrong');
+      }
+
+      return;
+    }
+
     if (response.status !== 200) {
       const data = (await response.json()) as { message: string };
       if (notifyErrors) {
@@ -12,6 +21,7 @@ export const useApi = () => {
       }
       return;
     }
+
     return (await response.json()) as T;
   };
 
