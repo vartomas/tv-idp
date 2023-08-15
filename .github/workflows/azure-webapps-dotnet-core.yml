@@ -28,7 +28,7 @@ jobs:
         run: rm -rf back/wwwroot/*
 
       - name: Copy front build to wwwroot
-        run: cp -r ./front/dist/* ./back/wwwroot/
+        run: cp -r front/dist/* back/wwwroot/
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
