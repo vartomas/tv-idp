@@ -24,7 +24,7 @@ jobs:
       - name: Build front-end
         run: cd front && npm run build
 
-      - name: Clean up old wwwroot
+      - name: Clean up wwwroot
         run: rm -rf back/wwwroot/*
 
       - name: Copy front build to wwwroot
