@@ -36,6 +36,9 @@ jobs:
           dotnet-version: '7.x'
           include-prerelease: true
 
+      - name: Restore dotnet dependencies
+        run: cd back && dotnet restore
+
       - name: Build with dotnet
         run: cd back && dotnet build --configuration Release
 
