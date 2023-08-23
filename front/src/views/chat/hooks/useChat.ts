@@ -1,9 +1,10 @@
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { useEffect, useState } from 'react';
+import { Message } from '../ChatModel';
 
 export const useChat = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     const newConnection = new HubConnectionBuilder().withUrl('/ws/chat').withAutomaticReconnect().build();
@@ -15,12 +16,8 @@ export const useChat = () => {
       connection
         .start()
         .then(() => {
-          connection.on('UserConnected', (data: string) => {
-            console.log(data);
-          });
-          connection.on('ReceiveMessage', (data: string) => {
-            console.log(data);
-            setMessages((prev) => [...prev, data]);
+          connection.on('ReceiveMessage', (data: Message) => {
+            setMessages((prev) => [data, ...prev]);
           });
         })
         .catch((err) => console.error(err));

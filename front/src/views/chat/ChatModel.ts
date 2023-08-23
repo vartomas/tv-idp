@@ -1,0 +1,9 @@
+export interface ChatInputForm {
+  message: string;
+}
+
+export interface Message {
+  username: string;
+  message: string;
+  type: 'info' | 'message';
+}

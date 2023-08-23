@@ -5,7 +5,7 @@ import Home from '../../views/Home';
 import Login from '../../views/Login';
 import { useAuth } from '../hooks/useAuth';
 import Register from '../../views/Register';
-import Chat from '../../views/chat/Chat';
+import ChatPage from '../../views/chat/ChatPage';
 import { useUser } from '../state/useUser';
 
 const Navigator = () => {
@@ -33,7 +33,7 @@ const Navigator = () => {
 
   const authorisedRoutes = [
     <Route key="/" path="/" element={<Home />} />,
-    <Route key="chat" path="chat" element={<Chat />} />,
+    <Route key="chat" path="chat" element={<ChatPage />} />,
   ];
 
   return (
