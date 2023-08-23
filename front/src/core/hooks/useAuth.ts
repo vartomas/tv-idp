@@ -3,6 +3,7 @@ import { checkUser, loginUser, registerUser } from '../api/user';
 import { UserDto } from '../model/user';
 import { useUser } from '../state/useUser';
 import { useApi } from './useApi';
+import { getCookie } from '../utils/cookies';
 
 export const useAuth = () => {
   const { call } = useApi();
@@ -11,6 +12,10 @@ export const useAuth = () => {
   const navigate = useNavigate();
 
   const initializeUser = async () => {
+    if (!getCookie('token')) {
+      return;
+    }
+
     const user = await call<UserDto>(checkUser());
 
     if (user) {
@@ -39,7 +44,7 @@ export const useAuth = () => {
   const logout = () => {
     document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     clearUser();
-    navigate('login');
+    navigate('/');
   };
 
   return { initializeUser, login, register, logout };

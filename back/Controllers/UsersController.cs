@@ -57,8 +57,7 @@ public class UsersController : ControllerBase
     public IActionResult Check()
     {
         var user = HttpContext.Items["User"];
-        var res = new
-        { ((User)user!).Id, ((User)user!).Username };
+        var res = new { ((User)user!).Id, ((User)user!).Username };
         return Ok(res);
     }
 }

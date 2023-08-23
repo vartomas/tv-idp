@@ -2,14 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using TV_IDP.Authorization;
 using TV_IDP.Helpers;
 using TV_IDP.Services;
+using TV_IDP.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTION_STRING");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
@@ -23,12 +23,6 @@ builder.Services.Configure<JwtSettings>(configuration.GetSection("JWT"));
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -37,5 +31,6 @@ app.UseMiddleware<JwtMiddleware>();
 
 app.MapControllers();
 app.MapFallbackToFile("index.html");
+app.MapHub<ChatHub>("/ws/chat");
 
 app.Run();

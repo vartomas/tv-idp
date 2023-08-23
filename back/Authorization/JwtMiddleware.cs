@@ -1,4 +1,5 @@
 ﻿namespace TV_IDP.Authorization;
+
 using TV_IDP.Services;
 
 public class JwtMiddleware

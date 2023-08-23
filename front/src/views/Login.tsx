@@ -5,8 +5,7 @@ import { useAuth } from '../core/hooks/useAuth';
 import { object, string, InferType } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import FormError from '../components/FormError';
-import { Link, Navigate } from 'react-router-dom';
-import { useUser } from '../core/state/useUser';
+import { Link } from 'react-router-dom';
 
 const loginSchema = object({
   username: string()
@@ -18,8 +17,6 @@ type LoginForm = InferType<typeof loginSchema>;
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-
-  const username = useUser((state) => state.username);
 
   const { control, handleSubmit } = useForm<LoginForm>({
     mode: 'onSubmit',
@@ -33,10 +30,6 @@ const Login = () => {
     await login(data.username, data.password);
     setLoading(false);
   });
-
-  if (username) {
-    return <Navigate to="/" />;
-  }
 
   return (
     <div className="w-screen h-screen flex justify-center items-center">
