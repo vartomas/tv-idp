@@ -6,6 +6,13 @@ export const useChat = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
+  const scrollToBottom = () => {
+    const messagesContainer = document.getElementById('messagesContainer');
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  };
+
   useEffect(() => {
     const newConnection = new HubConnectionBuilder().withUrl('/ws/chat').withAutomaticReconnect().build();
     setConnection(newConnection);
@@ -17,7 +24,7 @@ export const useChat = () => {
         .start()
         .then(() => {
           connection.on('ReceiveMessage', (data: Message) => {
-            setMessages((prev) => [data, ...prev]);
+            setMessages((prev) => [...prev, data]);
           });
         })
         .catch((err) => console.error(err));
@@ -29,6 +36,10 @@ export const useChat = () => {
       }
     };
   }, [connection]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const sendMessage = async (message: string) => {
     try {

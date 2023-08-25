@@ -27,12 +27,18 @@ const ChatInput: FC<Props> = ({ sendMessage }) => {
   };
 
   return (
-    <div className="w-full h-full p-2">
+    <div className="w-full h-full py-2 pr-2">
       <Controller
         control={control}
         name="message"
         render={({ field }) => (
-          <TextArea {...field} className="h-full" autoSize={{ minRows: 3, maxRows: 3 }} onKeyDown={handleKeyDown} />
+          <TextArea
+            {...field}
+            className="h-full"
+            autoSize={{ minRows: 3, maxRows: 3 }}
+            autoFocus
+            onKeyDown={handleKeyDown}
+          />
         )}
       />
     </div>

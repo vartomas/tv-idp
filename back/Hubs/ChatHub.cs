@@ -33,5 +33,4 @@ public sealed class ChatHub : Hub
 
         await Clients.All.SendAsync("ReceiveMessage", chatMessage);
     }
-        
 }

@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import Register from '../../views/Register';
 import ChatPage from '../../views/chat/ChatPage';
 import { useUser } from '../state/useUser';
+import PageNotFound from '../../views/PageNotFound';
 
 const Navigator = () => {
   const username = useUser((state) => state.username);
@@ -39,7 +40,7 @@ const Navigator = () => {
   return (
     <Routes>
       {[...(username ? authorisedRoutes : unauthorisedRoutes)]}
-      <Route path="*" element={username ? <Home /> : <Login />} />
+      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 };

@@ -11,13 +11,16 @@ const ChatMessages: FC<Props> = ({ messages }) => {
   const username = useUser((state) => state.username);
 
   return (
-    <div className="w-full h-full flex flex-col-reverse">
+    <>
       {messages.map((msg) => (
-        <div className={`p-1 ${msg.username === username ? 'self-end' : 'self-start'}`}>
+        <div
+          className={`px-2 py-1 ${msg.username === username ? 'ml-auto' : 'mr-auto'}`}
+          style={{ width: 'fit-content', maxWidth: '80%' }}
+        >
           <ChatMessage message={msg} />
         </div>
       ))}
-    </div>
+    </>
   );
 };
 
