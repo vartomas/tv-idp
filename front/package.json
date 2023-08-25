@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
+    "@microsoft/signalr": "^7.0.10",
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "antd": "^5.7.3",
     "localforage": "^1.10.0",

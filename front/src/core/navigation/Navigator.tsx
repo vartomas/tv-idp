@@ -5,9 +5,12 @@ import Home from '../../views/Home';
 import Login from '../../views/Login';
 import { useAuth } from '../hooks/useAuth';
 import Register from '../../views/Register';
-import Protected from '../../components/Protected';
+import ChatPage from '../../views/chat/ChatPage';
+import { useUser } from '../state/useUser';
+import PageNotFound from '../../views/PageNotFound';
 
 const Navigator = () => {
+  const username = useUser((state) => state.username);
   const [initializing, setInitializing] = useState(true);
   const { initializeUser } = useAuth();
 
@@ -24,18 +27,20 @@ const Navigator = () => {
     return <Loader />;
   }
 
+  const unauthorisedRoutes = [
+    <Route key="/" path="/" element={<Login />} />,
+    <Route key="register" path="register" element={<Register />} />,
+  ];
+
+  const authorisedRoutes = [
+    <Route key="/" path="/" element={<Home />} />,
+    <Route key="chat" path="chat" element={<ChatPage />} />,
+  ];
+
   return (
     <Routes>
-      <Route path="login" element={<Login />} />
-      <Route path="register" element={<Register />} />
-      <Route
-        path="/"
-        element={
-          <Protected>
-            <Home />
-          </Protected>
-        }
-      />
+      {[...(username ? authorisedRoutes : unauthorisedRoutes)]}
+      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 };

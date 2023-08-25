@@ -2,8 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+::-webkit-scrollbar {
+  background-color: rgba(0, 0, 0, 0);
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #babac0;
+  border-radius: 6px;
+  border: 2px solid #f8fafc;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
 }
