@@ -9,7 +9,7 @@ const ChatSideBar: FC<Props> = ({ connectedUsers }) => {
     <div className="w-full h-full p-2">
       <div className="w-full h-full p-2 bg-white rounded border-solid border border-slate-200 shadow-inner">
         {connectedUsers.map((user) => (
-          <p>{user}</p>
+          <p key={user}>{user}</p>
         ))}
       </div>
     </div>

@@ -10,7 +10,7 @@ public sealed class ChatHub : Hub
     public override async Task OnConnectedAsync()
     {
         var user = GetUser();
-        HubConnections.AddUser(user.Username);
+        HubConnections.AddUser(new HubConnection() { Id = user.Id, Username = user.Username, ConnectionId = Context.ConnectionId });
         await Clients.All.SendAsync("ReceiveMessage", CreateChatMessage(ChatMessageType.Connected));
         await base.OnConnectedAsync();
     }
@@ -18,7 +18,7 @@ public sealed class ChatHub : Hub
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var user = GetUser();
-        HubConnections.RemoveUser(user.Username);
+        HubConnections.RemoveUser(Context.ConnectionId);
         await Clients.All.SendAsync("ReceiveMessage", CreateChatMessage(ChatMessageType.Disconnected));
         await base.OnDisconnectedAsync(exception);
     }
@@ -59,7 +59,8 @@ public sealed class ChatHub : Hub
 
         if (type == ChatMessageType.Connected | type == ChatMessageType.Disconnected)
         {
-            chatMessage.ConnectedUsers = HubConnections.GetConnections();
+            var connectedUsers = HubConnections.GetConnections();
+            chatMessage.ConnectedUsers = connectedUsers.Select(user => user.Username).ToList();
         }
 
         return chatMessage;

@@ -1,10 +1,12 @@
-﻿namespace TV_IDP.Hubs;
+﻿using TV_IDP.Models;
+
+namespace TV_IDP.Hubs;
 
 public static class HubConnections
 {
-    private static readonly List<string> connections = new();
+    private static readonly List<HubConnection> connections = new();
 
-    public static void AddUser(string user)
+    public static void AddUser(HubConnection user)
     {
         lock (connections)
         {
@@ -12,15 +14,15 @@ public static class HubConnections
         }
     }
 
-    public static void RemoveUser(string user)
+    public static void RemoveUser(string connectionId)
     {
         lock (connections)
         {
-            connections.Remove(user);
+            connections.RemoveAll(user => user.ConnectionId == connectionId);
         }
     }
 
-    public static List<string> GetConnections()
+    public static List<HubConnection> GetConnections()
     {
         return connections;
     }
