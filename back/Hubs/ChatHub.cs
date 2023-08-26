@@ -9,13 +9,17 @@ public sealed class ChatHub : Hub
 {
     public override async Task OnConnectedAsync()
     {
-        await Clients.Others.SendAsync("ReceiveMessage", CreateChatMessage(ChatMessageType.Connected));
+        var user = GetUser();
+        HubConnections.AddUser(user.Username);
+        await Clients.All.SendAsync("ReceiveMessage", CreateChatMessage(ChatMessageType.Connected));
         await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await Clients.Others.SendAsync("ReceiveMessage", CreateChatMessage(ChatMessageType.Disconnected));
+        var user = GetUser();
+        HubConnections.RemoveUser(user.Username);
+        await Clients.All.SendAsync("ReceiveMessage", CreateChatMessage(ChatMessageType.Disconnected));
         await base.OnDisconnectedAsync(exception);
     }
 
@@ -24,13 +28,19 @@ public sealed class ChatHub : Hub
         await Clients.All.SendAsync("ReceiveMessage", CreateChatMessage(ChatMessageType.UserMessage, message));
     }
 
-    public ChatMessage CreateChatMessage(ChatMessageType type, string message = "")
+    public User GetUser()
     {
         if (Context.GetHttpContext()?.Items["User"] is not User user)
         {
             throw new Exception("User not found");
         }
 
+        return user;
+    }
+
+    public ChatMessage CreateChatMessage(ChatMessageType type, string message = "")
+    {
+        var user = GetUser();
         var newMessage = type switch
         {
             ChatMessageType.UserMessage => message,
@@ -46,6 +56,11 @@ public sealed class ChatHub : Hub
             Type = type == ChatMessageType.UserMessage ? "message" : "info",
             Id = Guid.NewGuid()
         };
+
+        if (type == ChatMessageType.Connected | type == ChatMessageType.Disconnected)
+        {
+            chatMessage.ConnectedUsers = HubConnections.GetConnections();
+        }
 
         return chatMessage;
     }

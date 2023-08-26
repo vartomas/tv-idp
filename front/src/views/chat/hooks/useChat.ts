@@ -5,6 +5,7 @@ import { Message } from '../ChatModel';
 export const useChat = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
 
   const scrollToBottom = () => {
     const messagesContainer = document.getElementById('messagesContainer');
@@ -25,6 +26,9 @@ export const useChat = () => {
         .then(() => {
           connection.on('ReceiveMessage', (data: Message) => {
             setMessages((prev) => [...prev, data]);
+            if (data.type === 'info') {
+              setConnectedUsers(data.connectedUsers.sort((a, b) => a.localeCompare(b)));
+            }
           });
         })
         .catch((err) => console.error(err));
@@ -51,5 +55,5 @@ export const useChat = () => {
     }
   };
 
-  return { messages, sendMessage };
+  return { messages, connectedUsers, sendMessage };
 };

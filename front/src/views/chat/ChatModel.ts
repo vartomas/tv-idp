@@ -7,4 +7,5 @@ export interface Message {
   message: string;
   type: 'info' | 'message';
   id: string;
+  connectedUsers: string[];
 }

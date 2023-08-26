@@ -6,5 +6,6 @@
         public required string Username { get; set; }
         public required string Type { get; set; }
         public required Guid Id { get; set; }
+        public List<string> ConnectedUsers { get; set; } = new();
     }
 }

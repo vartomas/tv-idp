@@ -5,12 +5,12 @@ import ChatSideBar from './components/ChatSideBar';
 import { useChat } from './hooks/useChat';
 
 const ChatPage = () => {
-  const { messages, sendMessage } = useChat();
+  const { messages, connectedUsers, sendMessage } = useChat();
 
   return (
     <Row className="h-screen bg-slate-50">
       <Col span={3}>
-        <ChatSideBar />
+        <ChatSideBar connectedUsers={connectedUsers} />
       </Col>
       <Col span={21} className="h-full">
         <div className="w-full pt-auto overflow-auto" style={{ height: 'calc(100% - 92px)' }} id="messagesContainer">
