@@ -9,22 +9,22 @@ public sealed class ChatHub : Hub
 {
     public override async Task OnConnectedAsync()
     {
-        await Clients.Others.SendAsync("ReceiveMessage", CreateChatMessage("info", "has connected"));
+        await Clients.Others.SendAsync("ReceiveMessage", CreateChatMessage(ChatMessageType.Connected));
         await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await Clients.Others.SendAsync("ReceiveMessage", CreateChatMessage("info", "has disconnected"));
+        await Clients.Others.SendAsync("ReceiveMessage", CreateChatMessage(ChatMessageType.Disconnected));
         await base.OnDisconnectedAsync(exception);
     }
 
     public async Task NewMessage(string message)
     {
-        await Clients.All.SendAsync("ReceiveMessage", CreateChatMessage("message", message));
+        await Clients.All.SendAsync("ReceiveMessage", CreateChatMessage(ChatMessageType.UserMessage, message));
     }
 
-    public ChatMessage CreateChatMessage(string type, string message)
+    public ChatMessage CreateChatMessage(ChatMessageType type, string message = "")
     {
         if (Context.GetHttpContext()?.Items["User"] is not User user)
         {
@@ -33,8 +33,9 @@ public sealed class ChatHub : Hub
 
         var newMessage = type switch
         {
-            "message" => message,
-            "info" => $"{user.Username} {message}",
+            ChatMessageType.UserMessage => message,
+            ChatMessageType.Connected => $"{user.Username} has connected",
+            ChatMessageType.Disconnected => $"{user.Username} has disconnected",
             _ => throw new Exception("Invalid message type"),
         };
 
@@ -42,7 +43,7 @@ public sealed class ChatHub : Hub
         {
             Username = user.Username,
             Message = newMessage,
-            Type = type,
+            Type = type == ChatMessageType.UserMessage ? "message" : "info",
             Id = Guid.NewGuid()
         };
 
