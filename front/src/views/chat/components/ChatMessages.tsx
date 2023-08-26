@@ -14,6 +14,7 @@ const ChatMessages: FC<Props> = ({ messages }) => {
     <>
       {messages.map((msg) => (
         <div
+          key={msg.id}
           className={`px-2 py-1 ${msg.username === username ? 'ml-auto' : 'mr-auto'}`}
           style={{ width: 'fit-content', maxWidth: '80%' }}
         >

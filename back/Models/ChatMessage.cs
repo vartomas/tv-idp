@@ -5,5 +5,6 @@
         public required string Message { get; set; }
         public required string Username { get; set; }
         public required string Type { get; set; }
+        public required Guid Id { get; set; }
     }
 }
