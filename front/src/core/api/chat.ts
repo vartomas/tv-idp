@@ -1,3 +1,4 @@
-import { get } from './api';
-
-export const getChannels = () => () => get('api/Chat/GetChannels');
+export const getChannels = async () => {
+  const res = await fetch('api/Chat/GetChannels');
+  return res.json();
+};

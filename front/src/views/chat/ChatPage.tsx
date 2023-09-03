@@ -7,10 +7,17 @@ import Navbar from '../../components/Navbar';
 import Loader from '../Loader';
 
 const ChatPage = () => {
-  const { initialized, currentChannel, availableChannels, messages, connectedUsers, sendMessage, setCurrentChannel } =
-    useChat();
+  const {
+    channelsLoading,
+    currentChannel,
+    availableChannels,
+    messages,
+    connectedUsers,
+    sendMessage,
+    setCurrentChannel,
+  } = useChat();
 
-  if (!initialized) {
+  if (channelsLoading) {
     return <Loader />;
   }
 

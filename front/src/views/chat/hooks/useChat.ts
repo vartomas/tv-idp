@@ -2,17 +2,15 @@ import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { useEffect, useState } from 'react';
 import { ChannelDto, Message } from '../ChatModel';
 import { getChannels } from '../../../core/api/chat';
-import { useApi } from '../../../core/hooks/useApi';
+import { useQuery } from '@tanstack/react-query';
 
 export const useChat = () => {
-  const [initialized, setInitialized] = useState(false);
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
   const [currentChannel, setCurrentChannel] = useState<ChannelDto>({ id: 0, name: 'main', messages: [] });
-  const [availableChannels, setAvailableChannels] = useState<ChannelDto[]>([{ id: 0, name: 'main', messages: [] }]);
 
-  const { call } = useApi();
+  const { data, isLoading } = useQuery<ChannelDto[]>(['channels'], getChannels);
 
   const scrollToBottom = () => {
     const messagesContainer = document.getElementById('messagesContainer');
@@ -56,12 +54,22 @@ export const useChat = () => {
   const sendMessage = async (message: string) => {
     try {
       if (connection?.state === 'Connected') {
-        await connection.send('newMessage', message, currentChannel);
+        await connection.send('newMessage', message, currentChannel.id || currentChannel.name);
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  return { initialized, currentChannel, availableChannels, messages, connectedUsers, sendMessage, setCurrentChannel };
+  const availableChannels = [{ id: 0, name: 'main', messages: [] }, ...(data || [])];
+
+  return {
+    channelsLoading: isLoading,
+    currentChannel,
+    availableChannels,
+    messages,
+    connectedUsers,
+    sendMessage,
+    setCurrentChannel,
+  };
 };
