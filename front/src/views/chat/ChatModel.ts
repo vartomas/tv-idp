@@ -15,3 +15,8 @@ export interface ChannelDto {
   name: string;
   messages: Message[];
 }
+
+export interface ConnectedUser {
+  id: number;
+  username: string;
+}

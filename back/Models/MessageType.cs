@@ -4,6 +4,8 @@
     {
         Connected,
         Disconnected,
+        JoinedChannel,
+        LeftChannel,
         UserMessage
     }
 }

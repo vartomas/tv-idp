@@ -1,6 +1,6 @@
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { useEffect, useState } from 'react';
-import { ChannelDto, Message } from '../ChatModel';
+import { ChannelDto, ConnectedUser, Message } from '../ChatModel';
 import { getChannels } from '../../../core/api/chat';
 import { useQuery } from '@tanstack/react-query';
 
@@ -31,10 +31,9 @@ export const useChat = () => {
         .then(() => {
           connection.on('ReceiveMessage', (data: Message) => {
             setMessages((prev) => [...prev, data]);
-            console.log(data);
-            if (data.type === 'info') {
-              setConnectedUsers(data.connectedUsers.sort((a, b) => a.localeCompare(b)));
-            }
+          });
+          connection.on('UserList', (data: ConnectedUser[]) => {
+            setConnectedUsers(data.map((x) => x.username).sort((a, b) => a.localeCompare(b)));
           });
         })
         .catch((err) => console.error(err));

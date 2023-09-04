@@ -42,7 +42,7 @@ const Navbar: FC<Props> = ({ currentChannel, availableChannels, setCurrentChanne
       <div>
         <span className="text-blue-600">{username}</span>
         <Dropdown menu={{ items: avatarMenuItems }} placement="bottomLeft" trigger={['click']}>
-          <Avatar size="small" className="bg-blue-600 ml-2 cursor-pointer">
+          <Avatar size="small" className="bg-blue-600 ml-2 cursor-pointer select-none">
             {username[0]}
           </Avatar>
         </Dropdown>
