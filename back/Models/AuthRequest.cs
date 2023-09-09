@@ -1,6 +1,6 @@
 ﻿namespace TV_IDP.Models;
 
-public class UserDto
+public class AuthRequest
 {
     public required string Username { get; set; }
 

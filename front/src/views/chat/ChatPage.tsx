@@ -9,12 +9,12 @@ import Loader from '../Loader';
 const ChatPage = () => {
   const {
     channelsLoading,
-    currentChannel,
+    currentChannelId,
     availableChannels,
     messages,
     connectedUsers,
     sendMessage,
-    setCurrentChannel,
+    setCurrentChannelId,
   } = useChat();
 
   if (channelsLoading) {
@@ -25,9 +25,9 @@ const ChatPage = () => {
     <div className="h-screen bg-slate-50">
       <div className="shadow" style={{ height: '40px' }}>
         <Navbar
-          currentChannel={currentChannel}
+          currentChannelId={currentChannelId}
           availableChannels={availableChannels}
-          setCurrentChannel={setCurrentChannel}
+          setCurrentChannelId={setCurrentChannelId}
         />
       </div>
       <Row style={{ height: 'calc(100% - 40px)' }}>
@@ -38,7 +38,7 @@ const ChatPage = () => {
           <div className="w-full pt-auto overflow-auto" style={{ height: 'calc(100% - 92px)' }} id="messagesContainer">
             <div className="h-full flex flex-col">
               <div className="flex-auto"></div>
-              <ChatMessages messages={messages} />
+              <ChatMessages messages={messages.filter((x) => x.channelId === currentChannelId)} />
             </div>
           </div>
           <div style={{ height: '92px' }}>

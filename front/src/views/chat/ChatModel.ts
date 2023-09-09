@@ -7,7 +7,7 @@ export interface Message {
   body: string;
   type: 'info' | 'message';
   id: number;
-  connectedUsers: string[];
+  channelId: number;
 }
 
 export interface ChannelDto {

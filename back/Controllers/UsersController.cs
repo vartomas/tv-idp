@@ -19,7 +19,7 @@ public class UsersController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost(nameof(Register))]
-    public async Task<IActionResult> Register(UserDto request)
+    public async Task<IActionResult> Register(AuthRequest request)
     {
         var response = await _userService.Create(request);
         if (response == null)
@@ -38,7 +38,7 @@ public class UsersController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost(nameof(Login))]
-    public async Task<IActionResult> Login(UserDto request)
+    public async Task<IActionResult> Login(AuthRequest request)
     {
         var response = await _userService.LogIn(request);
         if (response == null)

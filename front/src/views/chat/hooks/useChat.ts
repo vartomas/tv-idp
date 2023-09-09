@@ -8,7 +8,7 @@ export const useChat = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
-  const [currentChannel, setCurrentChannel] = useState<ChannelDto>({ id: 0, name: 'main', messages: [] });
+  const [currentChannelId, setCurrentChannelId] = useState(21);
 
   const { data, isLoading } = useQuery<ChannelDto[]>(['channels'], getChannels);
 
@@ -50,25 +50,31 @@ export const useChat = () => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    data?.forEach((channel) => {
+      setMessages((prev) => [...prev, ...channel.messages]);
+    });
+  }, [data]);
+
   const sendMessage = async (message: string) => {
     try {
       if (connection?.state === 'Connected') {
-        await connection.send('newMessage', message, currentChannel.id || currentChannel.name);
+        await connection.send('newMessage', message, currentChannelId);
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  const availableChannels = [{ id: 0, name: 'main', messages: [] }, ...(data || [])];
+  const availableChannels = data || [];
 
   return {
     channelsLoading: isLoading,
-    currentChannel,
+    currentChannelId,
     availableChannels,
     messages,
     connectedUsers,
     sendMessage,
-    setCurrentChannel,
+    setCurrentChannelId,
   };
 };

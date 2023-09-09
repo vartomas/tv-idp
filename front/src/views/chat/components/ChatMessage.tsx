@@ -16,7 +16,7 @@ const ChatMessage: FC<Props> = ({ message }) => {
   const infoMessage = <div className="text-xs font-light text-blue-600/100">{message.body}</div>;
 
   return (
-    <div className="p-2 bg-white rounded border-solid border border-slate-200 shadow-inner">
+    <div className="p-2 bg-white rounded border-solid border border-slate-200 shadow-xs">
       {message.type === 'message' ? chatMessage : infoMessage}
     </div>
   );

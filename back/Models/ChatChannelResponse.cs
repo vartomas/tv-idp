@@ -6,6 +6,6 @@ namespace TV_IDP.Models
     {
         public int Id { get; set; }
         public required string Name { get; set; }
-        public List<ChatMessage> Messages { get; set; } = new();
+        public List<Message> Messages { get; set; } = new();
     }
 }

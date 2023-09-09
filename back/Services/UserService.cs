@@ -7,8 +7,8 @@ using TV_IDP.Models;
 
 public interface IUserService
 {
-    Task<AuthenticateResponse?> LogIn(UserDto request);
-    Task<AuthenticateResponse?> Create(UserDto request);
+    Task<AuthenticateResponse?> LogIn(AuthRequest request);
+    Task<AuthenticateResponse?> Create(AuthRequest request);
     Task<User?> GetById(int id);
 }
 
@@ -23,7 +23,7 @@ public class UserService : IUserService
         _jwtUtils = jwtUtils;
     }
 
-    public async Task<AuthenticateResponse?> LogIn(UserDto request)
+    public async Task<AuthenticateResponse?> LogIn(AuthRequest request)
     {
         var user = await _context.Users.FirstOrDefaultAsync(user => user.Username == request.Username);
         if (user == null) return null;
@@ -31,10 +31,17 @@ public class UserService : IUserService
         if (!passwordValid) return null;
         var token = _jwtUtils.GenerateJwtToken(user);
 
+        var mainChannel = _context.ChatChannels.Include(channel => channel.Users).FirstOrDefault(channel => channel.Id == 21);
+        if (mainChannel is not null && !mainChannel.Users.Contains(user))
+        {
+            mainChannel.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+
         return new AuthenticateResponse(user, token);
     }
 
-    public async Task<AuthenticateResponse?> Create(UserDto request)
+    public async Task<AuthenticateResponse?> Create(AuthRequest request)
     {
         var foundUser = await _context.Users.FirstOrDefaultAsync(user => user.Username == request.Username);
         if (foundUser != null) return null;
@@ -46,6 +53,15 @@ public class UserService : IUserService
 
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
+
+        var mainChannel = _context.ChatChannels.FirstOrDefault(channel => channel.Id == 21);
+
+        if (mainChannel is not null)
+        {
+            mainChannel.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+
         var token = _jwtUtils.GenerateJwtToken(user);
         return new AuthenticateResponse(user, token);
     }

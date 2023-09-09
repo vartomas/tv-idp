@@ -1,12 +1,21 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using TV_IDP.Access.Models;
 using TV_IDP.Models;
+using TV_IDP.Services;
 
 namespace TV_IDP.Hubs;
 
 [Microsoft.AspNetCore.Authorization.Authorize(Policy = "SignalRJwtPolicy")]
 public sealed class ChatHub : Hub
 {
+    private readonly AppDbContext _context;
+
+    public ChatHub(AppDbContext context)
+    {
+        _context = context;
+    }
+
     public override async Task OnConnectedAsync()
     {
         var user = GetUser();
@@ -16,15 +25,15 @@ public sealed class ChatHub : Hub
             Username = user.Username,
             ConnectionId = Context.ConnectionId
         });
-        HubChannels.AddUserToChannel(0, user.Id);
-        await Groups.AddToGroupAsync(Context.ConnectionId, "main");
-        await Clients.Group("main").SendAsync("ReceiveMessage", CreateChatMessage(MessageType.Connected, "main"));
-        await Clients.Group("main").SendAsync("UserList", GetChannelUsers(0));
-        user.Channels.ForEach(async channel =>
+        HubChannels.AddUserToChannel(21, user.Id);
+        await Groups.AddToGroupAsync(Context.ConnectionId, "21");
+        await Clients.Group("21").SendAsync("UserList", GetChannelUsers(21));
+        var channels = await _context.ChatChannels.Where(channel => channel.Users.Contains(user)).Include(x => x.Messages).ToListAsync();
+        channels.ForEach(async channel =>
         {
             HubChannels.AddUserToChannel(channel.Id, user.Id);
             await Groups.AddToGroupAsync(Context.ConnectionId, channel.Id.ToString());
-            await Clients.Group(channel.Id.ToString()).SendAsync("ReceiveMessage", CreateChatMessage(MessageType.Connected, channel.Id.ToString()));
+            await Clients.Group(channel.Id.ToString()).SendAsync("ReceiveMessage", CreateChatMessage(MessageType.Connected, channel.Id));
             await Clients.Group(channel.Id.ToString()).SendAsync("UserList", GetChannelUsers(channel.Id));
         });
         await base.OnConnectedAsync();
@@ -34,13 +43,13 @@ public sealed class ChatHub : Hub
     {
         var user = GetUser();
         HubConnections.RemoveUser(Context.ConnectionId);
-        await Clients.Group("main").SendAsync("ReceiveMessage", CreateChatMessage(MessageType.Disconnected, "main"));
-        await Clients.Group("main").SendAsync("UserList", GetChannelUsers(0));
-        user.Channels.ForEach(async channel =>
+        HubChannels.RemoveUserFromChannel(21, user.Id);
+        var channels = await _context.ChatChannels.Where(channel => channel.Users.Contains(user)).Include(x => x.Messages).ToListAsync();
+        channels.ForEach(async channel =>
         {
             HubChannels.RemoveUserFromChannel(channel.Id, user.Id);
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, channel.Id.ToString());
-            await Clients.Group(channel.Id.ToString()).SendAsync("ReceiveMessage", CreateChatMessage(MessageType.Disconnected, channel.Id.ToString()));
+            await Clients.Group(channel.Id.ToString()).SendAsync("ReceiveMessage", CreateChatMessage(MessageType.Disconnected, channel.Id));
             await Clients.Group(channel.Id.ToString()).SendAsync("UserList", GetChannelUsers(channel.Id));
         });
         await base.OnDisconnectedAsync(exception);
@@ -51,7 +60,7 @@ public sealed class ChatHub : Hub
         var user = GetUser();
         HubChannels.AddUserToChannel(channelId, user.Id);
         await Groups.AddToGroupAsync(Context.ConnectionId, channelId.ToString());
-        await Clients.Group(channelId.ToString()).SendAsync("ReceiveMessage", CreateChatMessage(MessageType.JoinedChannel, channelId.ToString()));
+        await Clients.Group(channelId.ToString()).SendAsync("ReceiveMessage", CreateChatMessage(MessageType.JoinedChannel, channelId));
         await Clients.Group(channelId.ToString()).SendAsync("UserList", GetChannelUsers(channelId));
     }
 
@@ -60,11 +69,11 @@ public sealed class ChatHub : Hub
         var user = GetUser();
         HubChannels.RemoveUserFromChannel(channelId, user.Id);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, channelId.ToString());
-        await Clients.Group(channelId.ToString()).SendAsync("ReceiveMessage", CreateChatMessage(MessageType.LeftChannel, channelId.ToString()));
+        await Clients.Group(channelId.ToString()).SendAsync("ReceiveMessage", CreateChatMessage(MessageType.LeftChannel, channelId));
         await Clients.Group(channelId.ToString()).SendAsync("UserList", GetChannelUsers(channelId));
     }
 
-    public async Task NewMessage(string message, string channelId)
+    public async Task NewMessage(string message, int channelId)
     {
         await Clients.Group(channelId.ToString()).SendAsync("ReceiveMessage", CreateChatMessage(MessageType.UserMessage, channelId, message));
     }
@@ -79,7 +88,7 @@ public sealed class ChatHub : Hub
         return user;
     }
 
-    public Message CreateChatMessage(MessageType type, string channelId, string message = "")
+    public Message CreateChatMessage(MessageType type, int channelId, string message = "")
     {
         var user = GetUser();
         var newMessage = type switch
@@ -92,16 +101,20 @@ public sealed class ChatHub : Hub
             _ => throw new Exception("Invalid message type"),
         };
 
-        var chatMessage = new Message()
+        var messageType = type == MessageType.UserMessage ? "message" : "info";
+
+        var chatMessage = new ChatMessage { Body = newMessage, ChannelId = channelId, UserId = user.Id, Type = messageType, CreatedAt = DateTime.Now };
+        _context.ChatMessages.Add(chatMessage);
+        _context.SaveChanges();
+
+        return new Message()
         {
+            Id = chatMessage.Id,
             Username = user.Username,
             Body = newMessage,
-            Type = type == MessageType.UserMessage ? "message" : "info",
-            Id = Guid.NewGuid(),
-            ChannelId = channelId
+            Type = messageType,
+            ChannelId = channelId,
         };
-
-        return chatMessage;
     }
 
     public List<ConnectedUser> GetChannelUsers(int channelId)

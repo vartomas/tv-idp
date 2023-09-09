@@ -12,12 +12,10 @@ namespace TV_IDP.Controllers;
 [Route("api/[controller]")]
 public class ChatController : ControllerBase
 {
-    private readonly IUserService _userService;
     private readonly AppDbContext _context;
 
-    public ChatController(IUserService userService, AppDbContext context)
+    public ChatController(AppDbContext context)
     {
-        _userService = userService;
         _context = context;
     }
 
@@ -30,7 +28,12 @@ public class ChatController : ControllerBase
         {
             return BadRequest(new { message = "Bad request" });
         }
-        var channels = await _context.ChatChannels.Where(channel => channel.Users.Contains(user)).Include(x => x.Messages).ToListAsync();
+
+        var channels = await _context.ChatChannels
+            .Where(channel => channel.Users.Contains(user))
+            .Include(x => x.Messages)
+            .ThenInclude(x => x.User)
+            .ToListAsync();
 
         List<ChatChannelResponse> response = new();
         channels.ForEach(channel =>
@@ -39,36 +42,16 @@ public class ChatController : ControllerBase
             {
                 Id = channel.Id,
                 Name = channel.Name,
-                Messages = channel.Messages
+                Messages = channel.Messages.Select(message => new Message
+                {
+                    Id = message.Id,
+                    Body = message.Body,
+                    Type = message.Type,
+                    ChannelId = message.ChannelId,
+                    Username = message.User?.Username is not null ? message.User.Username : "Anonymous"
+                }).ToList()
             });
-        }); 
-
-        return Ok(response);
-    }
-
-    [HttpPost(nameof(CreateChannel))]
-    public async Task<IActionResult> CreateChannel(CreateChannelRequest request)
-    {
-        var user = HttpContext.Items["User"] as User;
-        var name = request.Name;
-
-        if (user == null || name == null)
-        {
-            return BadRequest(new { message = "Bad request" });
-        }
-
-        var newChannel = new ChatChannel
-        {
-            Name = request.Name,
-            Users = new List<User> { user },
-            CreatedAt = DateTime.UtcNow
-        };
-
-        await _context.ChatChannels.AddAsync(newChannel);
-        await _context.SaveChangesAsync();
-
-        var response = new ChatChannelResponse() { Id = newChannel.Id, Name = newChannel.Name };
-
+        });
         return Ok(response);
     }
 }

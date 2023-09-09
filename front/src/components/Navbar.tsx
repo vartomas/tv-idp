@@ -5,12 +5,12 @@ import { ChannelDto } from '../views/chat/ChatModel';
 import { FC } from 'react';
 
 interface Props {
-  currentChannel: ChannelDto;
+  currentChannelId: number;
   availableChannels: ChannelDto[];
-  setCurrentChannel: React.Dispatch<React.SetStateAction<ChannelDto>>;
+  setCurrentChannelId: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const Navbar: FC<Props> = ({ currentChannel, availableChannels, setCurrentChannel }) => {
+const Navbar: FC<Props> = ({ currentChannelId, availableChannels, setCurrentChannelId }) => {
   const username = useUser((state) => state.username);
   const { logout } = useAuth();
 
@@ -23,6 +23,7 @@ const Navbar: FC<Props> = ({ currentChannel, availableChannels, setCurrentChanne
   ];
 
   const channelOptions = availableChannels.map((channel) => ({ label: channel.name, value: channel.id }));
+  const currentValue = channelOptions.find((option) => option.value === currentChannelId);
 
   return (
     <div className="h-full flex items-center justify-between p-2">
@@ -33,10 +34,8 @@ const Navbar: FC<Props> = ({ currentChannel, availableChannels, setCurrentChanne
           className="w-40"
           labelInValue
           options={channelOptions}
-          value={{ label: currentChannel.name, value: currentChannel.id }}
-          onChange={(option) =>
-            setCurrentChannel(availableChannels.find((channel) => channel.id === option.value) as ChannelDto)
-          }
+          value={currentValue}
+          onChange={(option) => setCurrentChannelId(option.value)}
         />
       </div>
       <div>
