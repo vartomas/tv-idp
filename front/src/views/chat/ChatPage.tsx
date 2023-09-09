@@ -3,20 +3,25 @@ import ChatInput from './components/ChatInput';
 import ChatMessages from './components/ChatMessages';
 import ChatSideBar from './components/ChatSideBar';
 import { useChat } from './hooks/useChat';
-import Navbar from '../../components/Navbar';
+import ChatNavbar from './components/ChatNavbar';
 import Loader from '../Loader';
+import CreateChannelModal from './components/CreateChannelModal';
 
 const ChatPage = () => {
   const {
     initializing,
     leavingChannel,
+    creatingChannel,
     currentChannelId,
     availableChannels,
     messages,
     connectedUsers,
+    createChannelModalOpen,
     sendMessage,
     setCurrentChannelId,
     leave,
+    onCreateChannel,
+    setCreateChannelModalOpen,
   } = useChat();
 
   if (initializing) {
@@ -26,12 +31,13 @@ const ChatPage = () => {
   return (
     <div className="h-screen bg-slate-50">
       <div className="shadow" style={{ height: '40px' }}>
-        <Navbar
+        <ChatNavbar
           leavingChannel={leavingChannel}
           currentChannelId={currentChannelId}
           availableChannels={availableChannels}
           setCurrentChannelId={setCurrentChannelId}
           leave={leave}
+          onOpenCreateChannelModal={setCreateChannelModalOpen}
         />
       </div>
       <Row style={{ height: 'calc(100% - 40px)' }}>
@@ -50,6 +56,12 @@ const ChatPage = () => {
           </div>
         </Col>
       </Row>
+      <CreateChannelModal
+        open={createChannelModalOpen}
+        loading={creatingChannel}
+        onCreate={onCreateChannel}
+        onOpenChange={setCreateChannelModalOpen}
+      />
     </div>
   );
 };

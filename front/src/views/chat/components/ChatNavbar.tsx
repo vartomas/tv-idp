@@ -1,7 +1,7 @@
 import { Avatar, Button, Dropdown, MenuProps, Select } from 'antd';
-import { useUser } from '../core/state/useUser';
-import { useAuth } from '../core/hooks/useAuth';
-import { ChannelAction, ChannelDto } from '../views/chat/ChatModel';
+import { useUser } from '../../../core/state/useUser';
+import { useAuth } from '../../../core/hooks/useAuth';
+import { ChannelAction, ChannelDto } from '../ChatModel';
 import { FC } from 'react';
 import { UseMutateFunction } from '@tanstack/react-query';
 
@@ -11,9 +11,17 @@ interface Props {
   availableChannels: ChannelDto[];
   setCurrentChannelId: React.Dispatch<React.SetStateAction<number>>;
   leave: UseMutateFunction<ChannelAction, unknown, number, unknown>;
+  onOpenCreateChannelModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Navbar: FC<Props> = ({ leavingChannel, currentChannelId, availableChannels, setCurrentChannelId, leave }) => {
+const ChatNavbar: FC<Props> = ({
+  leavingChannel,
+  currentChannelId,
+  availableChannels,
+  setCurrentChannelId,
+  leave,
+  onOpenCreateChannelModal,
+}) => {
   const username = useUser((state) => state.username);
   const { logout } = useAuth();
 
@@ -51,7 +59,7 @@ const Navbar: FC<Props> = ({ leavingChannel, currentChannelId, availableChannels
         >
           Leave
         </Button>
-        <Button className="ml-1" size="small" type="primary">
+        <Button className="ml-1" size="small" type="primary" onClick={() => onOpenCreateChannelModal(true)}>
           Create
         </Button>
         <Button className="ml-1" size="small" type="primary">
@@ -70,4 +78,4 @@ const Navbar: FC<Props> = ({ leavingChannel, currentChannelId, availableChannels
   );
 };
 
-export default Navbar;
+export default ChatNavbar;
