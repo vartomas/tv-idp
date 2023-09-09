@@ -18,13 +18,14 @@ const createChannelSchema = object({
 type CreateChannelFrom = InferType<typeof createChannelSchema>;
 
 const CreateChannelModal: FC<Props> = ({ open, loading, onCreate, onOpenChange }) => {
-  const { control, handleSubmit } = useForm<CreateChannelFrom>({
+  const { control, handleSubmit, reset } = useForm<CreateChannelFrom>({
     mode: 'onChange',
     defaultValues: { name: '' },
   });
 
   const handleOk = handleSubmit((data) => {
     onCreate(data.name);
+    reset();
   });
 
   return (
@@ -35,8 +36,11 @@ const CreateChannelModal: FC<Props> = ({ open, loading, onCreate, onOpenChange }
       onOk={handleOk}
       onCancel={() => onOpenChange(false)}
     >
-      <p>Name:</p>
-      <Controller name="name" control={control} render={({ field }) => <Input {...field} />} />
+      <form onSubmit={handleOk}>
+        <p>Name:</p>
+        <Controller name="name" control={control} render={({ field }) => <Input {...field} />} />
+        <input type="submit" hidden />
+      </form>
     </Modal>
   );
 };
