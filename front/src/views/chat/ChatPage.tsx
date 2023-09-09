@@ -8,16 +8,18 @@ import Loader from '../Loader';
 
 const ChatPage = () => {
   const {
-    channelsLoading,
+    initializing,
+    leavingChannel,
     currentChannelId,
     availableChannels,
     messages,
     connectedUsers,
     sendMessage,
     setCurrentChannelId,
+    leave,
   } = useChat();
 
-  if (channelsLoading) {
+  if (initializing) {
     return <Loader />;
   }
 
@@ -25,9 +27,11 @@ const ChatPage = () => {
     <div className="h-screen bg-slate-50">
       <div className="shadow" style={{ height: '40px' }}>
         <Navbar
+          leavingChannel={leavingChannel}
           currentChannelId={currentChannelId}
           availableChannels={availableChannels}
           setCurrentChannelId={setCurrentChannelId}
+          leave={leave}
         />
       </div>
       <Row style={{ height: 'calc(100% - 40px)' }}>

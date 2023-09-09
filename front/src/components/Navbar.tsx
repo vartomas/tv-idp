@@ -1,16 +1,19 @@
 import { Avatar, Button, Dropdown, MenuProps, Select } from 'antd';
 import { useUser } from '../core/state/useUser';
 import { useAuth } from '../core/hooks/useAuth';
-import { ChannelDto } from '../views/chat/ChatModel';
+import { ChannelAction, ChannelDto } from '../views/chat/ChatModel';
 import { FC } from 'react';
+import { UseMutateFunction } from '@tanstack/react-query';
 
 interface Props {
+  leavingChannel: boolean;
   currentChannelId: number;
   availableChannels: ChannelDto[];
   setCurrentChannelId: React.Dispatch<React.SetStateAction<number>>;
+  leave: UseMutateFunction<ChannelAction, unknown, number, unknown>;
 }
 
-const Navbar: FC<Props> = ({ currentChannelId, availableChannels, setCurrentChannelId }) => {
+const Navbar: FC<Props> = ({ leavingChannel, currentChannelId, availableChannels, setCurrentChannelId, leave }) => {
   const username = useUser((state) => state.username);
   const { logout } = useAuth();
 
@@ -37,7 +40,15 @@ const Navbar: FC<Props> = ({ currentChannelId, availableChannels, setCurrentChan
           value={currentValue}
           onChange={(option) => setCurrentChannelId(option.value)}
         />
-        <Button className="ml-1" size="small" type="primary" danger disabled={currentChannelId === 21}>
+        <Button
+          className="ml-1"
+          size="small"
+          type="primary"
+          danger
+          disabled={currentChannelId === 21}
+          loading={leavingChannel}
+          onClick={() => leave(currentChannelId)}
+        >
           Leave
         </Button>
         <Button className="ml-1" size="small" type="primary">

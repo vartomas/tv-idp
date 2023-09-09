@@ -13,10 +13,15 @@ export interface Message {
 export interface ChannelDto {
   id: number;
   name: string;
-  messages: Message[];
 }
 
 export interface ConnectedUser {
   id: number;
   username: string;
+}
+
+export interface ChannelAction {
+  message: string;
+  name: string;
+  id: number;
 }

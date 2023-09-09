@@ -1,16 +1,71 @@
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { useEffect, useState } from 'react';
-import { ChannelDto, ConnectedUser, Message } from '../ChatModel';
-import { getChannels } from '../../../core/api/chat';
-import { useQuery } from '@tanstack/react-query';
+import { ChannelAction, ChannelDto, ConnectedUser, Message } from '../ChatModel';
+import { leaveChannel, getChannels, getMessages, joinChannel, createChannel } from '../../../core/api/chat';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 export const useChat = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
   const [currentChannelId, setCurrentChannelId] = useState(21);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [channels, setChannels] = useState<ChannelDto[]>([]);
 
-  const { data, isLoading } = useQuery<ChannelDto[]>(['channels'], getChannels);
+  const { isLoading: channelsLoading } = useQuery<ChannelDto[]>({
+    queryKey: ['channels'],
+    queryFn: getChannels,
+    staleTime: Infinity,
+    cacheTime: Infinity,
+    onSuccess: (data) => {
+      setChannels(data as ChannelDto[]);
+    },
+  });
+  const { isLoading: messagesLoading } = useQuery<Message[]>({
+    queryKey: ['messages'],
+    queryFn: getMessages,
+    staleTime: Infinity,
+    cacheTime: Infinity,
+    onSuccess: (data) => {
+      setMessages(data as Message[]);
+    },
+  });
+
+  const { mutate: create, isLoading: creatingChannel } = useMutation({
+    mutationFn: createChannel,
+    retry: false,
+    onSuccess: (response: ChannelAction) => {
+      setChannels((prev) => [...prev, { id: response.id, name: response.name }]);
+      setCurrentChannelId(response.id);
+    },
+    onError: (err) => {
+      console.error(err);
+    },
+  });
+
+  const { mutate: join, isLoading: joiningChannel } = useMutation({
+    mutationFn: joinChannel,
+    retry: false,
+    onSuccess: (response: ChannelAction) => {
+      setChannels((prev) => [...prev, { id: response.id, name: response.name }]);
+      setCurrentChannelId(response.id);
+    },
+    onError: (err) => {
+      console.error(err);
+    },
+  });
+
+  const { mutate: leave, isLoading: leavingChannel } = useMutation({
+    mutationFn: leaveChannel,
+    retry: false,
+    onSuccess: (response: ChannelAction) => {
+      console.log(response);
+      setChannels((prev) => prev.filter((x) => x.id !== response.id));
+      setCurrentChannelId(21);
+    },
+    onError: (err) => {
+      console.error(err);
+    },
+  });
 
   const scrollToBottom = () => {
     const messagesContainer = document.getElementById('messagesContainer');
@@ -50,14 +105,6 @@ export const useChat = () => {
     scrollToBottom();
   }, [messages, currentChannelId]);
 
-  useEffect(() => {
-    if (data) {
-      data.forEach((channel) => {
-        setMessages((prev) => [...prev, ...channel.messages]);
-      });
-    }
-  }, [data]);
-
   const sendMessage = async (message: string) => {
     try {
       if (connection?.state === 'Connected') {
@@ -69,18 +116,24 @@ export const useChat = () => {
   };
 
   const availableChannels =
-    data?.sort((a, b) => {
+    channels?.sort((a, b) => {
       if (a.name === 'main') return -1;
       return a.name.localeCompare(b.name);
     }) || [];
 
   return {
-    channelsLoading: isLoading,
+    initializing: channelsLoading || messagesLoading,
+    creatingChannel,
+    joiningChannel,
+    leavingChannel,
     currentChannelId,
     availableChannels,
     messages,
     connectedUsers,
     sendMessage,
     setCurrentChannelId,
+    create,
+    join,
+    leave,
   };
 };
