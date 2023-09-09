@@ -48,12 +48,14 @@ export const useChat = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, currentChannelId]);
 
   useEffect(() => {
-    data?.forEach((channel) => {
-      setMessages((prev) => [...prev, ...channel.messages]);
-    });
+    if (data) {
+      data.forEach((channel) => {
+        setMessages((prev) => [...prev, ...channel.messages]);
+      });
+    }
   }, [data]);
 
   const sendMessage = async (message: string) => {
@@ -66,7 +68,11 @@ export const useChat = () => {
     }
   };
 
-  const availableChannels = data || [];
+  const availableChannels =
+    data?.sort((a, b) => {
+      if (a.name === 'main') return -1;
+      return a.name.localeCompare(b.name);
+    }) || [];
 
   return {
     channelsLoading: isLoading,

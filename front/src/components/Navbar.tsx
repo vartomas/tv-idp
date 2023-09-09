@@ -1,4 +1,4 @@
-import { Avatar, Dropdown, MenuProps, Select } from 'antd';
+import { Avatar, Button, Dropdown, MenuProps, Select } from 'antd';
 import { useUser } from '../core/state/useUser';
 import { useAuth } from '../core/hooks/useAuth';
 import { ChannelDto } from '../views/chat/ChatModel';
@@ -37,6 +37,15 @@ const Navbar: FC<Props> = ({ currentChannelId, availableChannels, setCurrentChan
           value={currentValue}
           onChange={(option) => setCurrentChannelId(option.value)}
         />
+        <Button className="ml-1" size="small" type="primary" danger disabled={currentChannelId === 21}>
+          Leave
+        </Button>
+        <Button className="ml-1" size="small" type="primary">
+          Create
+        </Button>
+        <Button className="ml-1" size="small" type="primary">
+          Join
+        </Button>
       </div>
       <div>
         <span className="text-blue-600">{username}</span>

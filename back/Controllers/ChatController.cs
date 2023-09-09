@@ -54,4 +54,82 @@ public class ChatController : ControllerBase
         });
         return Ok(response);
     }
+
+    [HttpPost(nameof(CreateChannel))]
+    public async Task<IActionResult> CreateChannel(CreateChannelRequest request) 
+    {
+        var user = HttpContext.Items["User"] as User;
+
+        if (user is null || request.Name is null)
+        {
+            return BadRequest(new { message = "Bad request" });
+        }
+
+        var channel = new ChatChannel
+        {
+            Name = request.Name,
+            Users = new List<User> { user }
+        };
+
+        await _context.ChatChannels.AddAsync(channel);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Channel created", channel.Id });
+    }
+
+    [HttpPost(nameof(JoinChannel))]
+    public async Task<IActionResult> JoinChannel(JoinChannelRequest request)
+    {
+        var user = HttpContext.Items["User"] as User;
+
+        if (user is null)
+        {
+            return BadRequest(new { message = "Bad request" });
+        }
+
+        var channel = await _context.ChatChannels.FindAsync(request.Id);
+
+        if (channel is null)
+        {
+            return BadRequest(new { message = "Channel not found" });
+        }
+
+        if (channel.Users.Contains(user))
+        {
+            return BadRequest(new { message = "User already in channel" });
+        }
+
+        channel.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Channel joined", channel.Id });
+    }
+
+    [HttpPost(nameof(LeaveChannel))]
+    public async Task<IActionResult> LeaveChannel(LeaveChannelRequest request)
+    {
+        var user = HttpContext.Items["User"] as User;
+
+        if (user is null)
+        {
+            return BadRequest(new { message = "Bad request" });
+        }
+
+        var channel = await _context.ChatChannels.FindAsync(request.Id);
+
+        if (channel is null)
+        {
+            return BadRequest(new { message = "Channel not found" });
+        }
+
+        if (!channel.Users.Contains(user))
+        {
+            return BadRequest(new { message = "User not in channel" });
+        }
+
+        channel.Users.Remove(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Channel left", channel.Id });
+    }
 }
