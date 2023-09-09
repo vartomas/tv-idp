@@ -17,7 +17,7 @@ export const useChat = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
     onSuccess: (data) => {
-      setChannels(data as ChannelDto[]);
+      setChannels(data);
     },
   });
   const { isLoading: messagesLoading } = useQuery<Message[]>({
@@ -26,7 +26,7 @@ export const useChat = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
     onSuccess: (data) => {
-      setMessages(data as Message[]);
+      setMessages(data);
     },
   });
 
