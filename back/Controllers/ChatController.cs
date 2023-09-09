@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using TV_IDP.Access.Models;
 using TV_IDP.Authorization;
 using TV_IDP.Models;
