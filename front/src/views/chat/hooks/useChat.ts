@@ -58,7 +58,6 @@ export const useChat = () => {
     mutationFn: leaveChannel,
     retry: false,
     onSuccess: (response: ChannelAction) => {
-      console.log(response);
       setChannels((prev) => prev.filter((x) => x.id !== response.id));
       setCurrentChannelId(21);
     },
