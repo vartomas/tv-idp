@@ -19,7 +19,7 @@ const ChatPage = () => {
     createChannelModalOpen,
     sendMessage,
     setCurrentChannelId,
-    leave,
+    onLeave,
     onCreateChannel,
     setCreateChannelModalOpen,
   } = useChat();
@@ -36,7 +36,7 @@ const ChatPage = () => {
           currentChannelId={currentChannelId}
           availableChannels={availableChannels}
           setCurrentChannelId={setCurrentChannelId}
-          leave={leave}
+          onLeave={onLeave}
           onOpenCreateChannelModal={setCreateChannelModalOpen}
         />
       </div>

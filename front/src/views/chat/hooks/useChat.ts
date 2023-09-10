@@ -143,7 +143,7 @@ export const useChat = () => {
     sendMessage,
     setCurrentChannelId,
     join,
-    leave,
+    onLeave: leave,
     onCreateChannel: handleCreateChannel,
     setCreateChannelModalOpen,
   };

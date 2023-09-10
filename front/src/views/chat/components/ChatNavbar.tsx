@@ -10,7 +10,7 @@ interface Props {
   currentChannelId: number;
   availableChannels: ChannelDto[];
   setCurrentChannelId: React.Dispatch<React.SetStateAction<number>>;
-  leave: UseMutateFunction<ChannelAction, unknown, number, unknown>;
+  onLeave: UseMutateFunction<ChannelAction, unknown, number, unknown>;
   onOpenCreateChannelModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -19,7 +19,7 @@ const ChatNavbar: FC<Props> = ({
   currentChannelId,
   availableChannels,
   setCurrentChannelId,
-  leave,
+  onLeave,
   onOpenCreateChannelModal,
 }) => {
   const username = useUser((state) => state.username);
@@ -55,7 +55,7 @@ const ChatNavbar: FC<Props> = ({
           danger
           disabled={currentChannelId === 21}
           loading={leavingChannel}
-          onClick={() => leave(currentChannelId)}
+          onClick={() => onLeave(currentChannelId)}
         >
           Leave
         </Button>
