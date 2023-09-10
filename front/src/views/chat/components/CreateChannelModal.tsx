@@ -32,6 +32,7 @@ const CreateChannelModal: FC<Props> = ({ open, loading, onCreate, onOpenChange }
   return (
     <Modal
       title="Create channel"
+      getContainer={document.querySelector('#root') as HTMLElement}
       open={open}
       confirmLoading={loading}
       onOk={handleOk}
@@ -44,7 +45,7 @@ const CreateChannelModal: FC<Props> = ({ open, loading, onCreate, onOpenChange }
           control={control}
           render={({ field, fieldState: { error } }) => (
             <>
-              <Input {...field} />
+              <Input {...field} autoFocus />
               <FormError error={error?.message} />
             </>
           )}
