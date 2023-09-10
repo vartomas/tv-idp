@@ -2,6 +2,7 @@ import { Input, Modal } from 'antd';
 import { FC } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { InferType, object, string } from 'yup';
+import FormError from '../../../components/FormError';
 
 interface Props {
   open: boolean;
@@ -38,7 +39,16 @@ const CreateChannelModal: FC<Props> = ({ open, loading, onCreate, onOpenChange }
     >
       <form onSubmit={handleOk}>
         <p>Name:</p>
-        <Controller name="name" control={control} render={({ field }) => <Input {...field} />} />
+        <Controller
+          name="name"
+          control={control}
+          render={({ field, fieldState: { error } }) => (
+            <>
+              <Input {...field} />
+              <FormError error={error?.message} />
+            </>
+          )}
+        />
         <input type="submit" hidden />
       </form>
     </Modal>
