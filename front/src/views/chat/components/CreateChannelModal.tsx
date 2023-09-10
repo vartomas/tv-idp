@@ -33,11 +33,9 @@ const CreateChannelModal: FC<Props> = ({ open, loading, onCreate, onOpenChange }
   });
 
   const setFocus = () => {
-    if (inputRef?.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      });
-    }
+    setTimeout(() => {
+      inputRef.current?.focus();
+    });
   };
 
   useEffect(() => {
