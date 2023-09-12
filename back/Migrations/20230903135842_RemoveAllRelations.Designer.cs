@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TV_IDP.Services;
 
@@ -11,9 +12,11 @@ using TV_IDP.Services;
 namespace TV_IDP.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230903135842_RemoveAllRelations")]
+    partial class RemoveAllRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace TV_IDP.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ChatChannelUser", b =>
-                {
-                    b.Property<int>("ChannelsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ChannelsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("ChatChannelUser");
-                });
 
             modelBuilder.Entity("TV_IDP.Access.Models.ChatChannel", b =>
                 {
@@ -69,9 +57,6 @@ namespace TV_IDP.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ChannelId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -79,14 +64,7 @@ namespace TV_IDP.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ChannelId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("ChatMessages");
                 });
@@ -110,50 +88,6 @@ namespace TV_IDP.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("ChatChannelUser", b =>
-                {
-                    b.HasOne("TV_IDP.Access.Models.ChatChannel", null)
-                        .WithMany()
-                        .HasForeignKey("ChannelsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TV_IDP.Access.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("TV_IDP.Access.Models.ChatMessage", b =>
-                {
-                    b.HasOne("TV_IDP.Access.Models.ChatChannel", "Channel")
-                        .WithMany("Messages")
-                        .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TV_IDP.Access.Models.User", "User")
-                        .WithMany("Messages")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Channel");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TV_IDP.Access.Models.ChatChannel", b =>
-                {
-                    b.Navigation("Messages");
-                });
-
-            modelBuilder.Entity("TV_IDP.Access.Models.User", b =>
-                {
-                    b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
         }

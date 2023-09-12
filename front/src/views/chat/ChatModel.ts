@@ -4,8 +4,24 @@ export interface ChatInputForm {
 
 export interface Message {
   username: string;
-  message: string;
+  body: string;
   type: 'info' | 'message';
-  id: string;
-  connectedUsers: string[];
+  id: number;
+  channelId: number;
+}
+
+export interface ChannelDto {
+  id: number;
+  name: string;
+}
+
+export interface ConnectedUser {
+  id: number;
+  username: string;
+}
+
+export interface ChannelAction {
+  message: string;
+  name: string;
+  id: number;
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TV_IDP.Services;
 
@@ -11,9 +12,11 @@ using TV_IDP.Services;
 namespace TV_IDP.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230903114040_AddUserToChannels")]
+    partial class AddUserToChannels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,7 +139,7 @@ namespace TV_IDP.Migrations
                         .IsRequired();
 
                     b.HasOne("TV_IDP.Access.Models.User", "User")
-                        .WithMany("Messages")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -147,11 +150,6 @@ namespace TV_IDP.Migrations
                 });
 
             modelBuilder.Entity("TV_IDP.Access.Models.ChatChannel", b =>
-                {
-                    b.Navigation("Messages");
-                });
-
-            modelBuilder.Entity("TV_IDP.Access.Models.User", b =>
                 {
                     b.Navigation("Messages");
                 });

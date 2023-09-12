@@ -1,7 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import Loader from '../../views/Loader';
 import { useEffect, useState } from 'react';
-import Home from '../../views/Home';
 import Login from '../../views/Login';
 import { useAuth } from '../hooks/useAuth';
 import Register from '../../views/Register';
@@ -14,14 +13,14 @@ const Navigator = () => {
   const [initializing, setInitializing] = useState(true);
   const { initializeUser } = useAuth();
 
-  const checkUser = async () => {
-    await initializeUser();
-    setInitializing(false);
-  };
-
   useEffect(() => {
+    const checkUser = async () => {
+      await initializeUser();
+      setInitializing(false);
+    };
+
     checkUser();
-  }, []);
+  }, [initializeUser]);
 
   if (initializing) {
     return <Loader />;
@@ -32,10 +31,7 @@ const Navigator = () => {
     <Route key="register" path="register" element={<Register />} />,
   ];
 
-  const authorisedRoutes = [
-    <Route key="/" path="/" element={<Home />} />,
-    <Route key="chat" path="chat" element={<ChatPage />} />,
-  ];
+  const authorisedRoutes = [<Route key="/" path="/" element={<ChatPage />} />];
 
   return (
     <Routes>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TV_IDP.Services;
 
@@ -11,9 +12,11 @@ using TV_IDP.Services;
 namespace TV_IDP.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230903132446_ModelsFx")]
+    partial class ModelsFx
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,7 +72,7 @@ namespace TV_IDP.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ChannelId")
+                    b.Property<int>("ChatChannelId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -84,7 +87,7 @@ namespace TV_IDP.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChannelId");
+                    b.HasIndex("ChatChannelId");
 
                     b.HasIndex("UserId");
 
@@ -131,7 +134,7 @@ namespace TV_IDP.Migrations
                 {
                     b.HasOne("TV_IDP.Access.Models.ChatChannel", "Channel")
                         .WithMany("Messages")
-                        .HasForeignKey("ChannelId")
+                        .HasForeignKey("ChatChannelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
