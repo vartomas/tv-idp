@@ -11,6 +11,7 @@ export const useChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<ChannelDto[]>([]);
   const [createChannelModalOpen, setCreateChannelModalOpen] = useState(false);
+  const [joinChannelModalOpen, setJoinChannelModalOpen] = useState(false);
 
   const { isLoading: channelsLoading } = useQuery<ChannelDto[]>({
     queryKey: ['channels'],
@@ -54,6 +55,10 @@ export const useChat = () => {
     onSuccess: (response: ChannelAction) => {
       setChannels((prev) => [...prev, { id: response.id, name: response.name }]);
       setCurrentChannelId(response.id);
+      setJoinChannelModalOpen(false);
+      if (connection?.state === 'Connected') {
+        connection.send('joinChannel', response.id);
+      }
     },
     onError: (err) => {
       console.error(err);
@@ -130,6 +135,10 @@ export const useChat = () => {
     create(name);
   };
 
+  const handleJoinChannel = (id: string) => {
+    join(parseInt(id));
+  };
+
   return {
     initializing: channelsLoading || messagesLoading,
     creatingChannel,
@@ -140,11 +149,13 @@ export const useChat = () => {
     messages,
     connectedUsers,
     createChannelModalOpen,
+    joinChannelModalOpen,
     sendMessage,
     setCurrentChannelId,
-    join,
     onLeave: leave,
     onCreateChannel: handleCreateChannel,
+    onJoinChannel: handleJoinChannel,
     setCreateChannelModalOpen,
+    setJoinChannelModalOpen,
   };
 };

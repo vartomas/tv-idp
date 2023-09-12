@@ -4,6 +4,7 @@ import { useAuth } from '../../../core/hooks/useAuth';
 import { ChannelAction, ChannelDto } from '../ChatModel';
 import { FC } from 'react';
 import { UseMutateFunction } from '@tanstack/react-query';
+import { MoreOutlined } from '@ant-design/icons';
 
 interface Props {
   leavingChannel: boolean;
@@ -12,6 +13,7 @@ interface Props {
   setCurrentChannelId: React.Dispatch<React.SetStateAction<number>>;
   onLeave: UseMutateFunction<ChannelAction, unknown, number, unknown>;
   onOpenCreateChannelModal: React.Dispatch<React.SetStateAction<boolean>>;
+  onOpenJoinChannelModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ChatNavbar: FC<Props> = ({
@@ -21,6 +23,7 @@ const ChatNavbar: FC<Props> = ({
   setCurrentChannelId,
   onLeave,
   onOpenCreateChannelModal,
+  onOpenJoinChannelModal,
 }) => {
   const username = useUser((state) => state.username);
   const { logout } = useAuth();
@@ -33,42 +36,57 @@ const ChatNavbar: FC<Props> = ({
     },
   ];
 
+  const channelMenuItems: MenuProps['items'] = [
+    {
+      key: 'leave',
+      label: 'Leave this channel',
+      danger: true,
+      disabled: currentChannelId === 21,
+      onClick: () => onLeave(currentChannelId),
+    },
+    {
+      key: 'create',
+      label: 'Create channel',
+      onClick: () => onOpenCreateChannelModal(true),
+    },
+    {
+      key: 'join',
+      label: 'Join channel',
+      onClick: () => onOpenJoinChannelModal(true),
+    },
+  ];
+
+  if (currentChannelId !== 21) {
+    channelMenuItems.push({
+      key: 'channelId',
+      label: `Copy channel ID ${currentChannelId}`,
+      onClick: () => {
+        navigator.clipboard.writeText(currentChannelId.toString());
+      },
+    });
+  }
+
   const channelOptions = availableChannels.map((channel) => ({ label: channel.name, value: channel.id }));
   const currentValue = channelOptions.find((option) => option.value === currentChannelId);
 
   return (
     <div className="h-full flex items-center justify-between p-2">
       <div className="flex items-center">
-        <span>#</span>
         <Select
           size="small"
-          className="w-40"
+          className="w-48"
           labelInValue
           options={channelOptions}
           value={currentValue}
           onChange={(option) => setCurrentChannelId(option.value)}
         />
-        <Button
-          className="ml-1"
-          size="small"
-          type="primary"
-          danger
-          disabled={currentChannelId === 21}
-          loading={leavingChannel}
-          onClick={() => onLeave(currentChannelId)}
-        >
-          Leave
-        </Button>
-        <Button className="ml-1" size="small" type="primary" onClick={() => onOpenCreateChannelModal(true)}>
-          Create
-        </Button>
-        <Button className="ml-1" size="small" type="primary">
-          Join
-        </Button>
+        <Dropdown menu={{ items: channelMenuItems }} placement="bottomLeft" trigger={['click']}>
+          <Button className="ml-1" size="small" shape="circle" loading={leavingChannel} icon={<MoreOutlined />} />
+        </Dropdown>
       </div>
       <div>
         <span className="text-blue-600">{username}</span>
-        <Dropdown menu={{ items: avatarMenuItems }} placement="bottomLeft" trigger={['click']}>
+        <Dropdown menu={{ items: avatarMenuItems }} placement="bottomRight" trigger={['click']}>
           <Avatar size="small" className="bg-blue-600 ml-2 cursor-pointer select-none">
             {username[0]}
           </Avatar>

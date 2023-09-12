@@ -6,22 +6,27 @@ import { useChat } from './hooks/useChat';
 import ChatNavbar from './components/ChatNavbar';
 import Loader from '../Loader';
 import CreateChannelModal from './components/CreateChannelModal';
+import JoinChannelModal from './components/JoinChannelModal';
 
 const ChatPage = () => {
   const {
     initializing,
     leavingChannel,
+    joiningChannel,
     creatingChannel,
     currentChannelId,
     availableChannels,
     messages,
     connectedUsers,
     createChannelModalOpen,
+    joinChannelModalOpen,
     sendMessage,
     setCurrentChannelId,
     onLeave,
     onCreateChannel,
+    onJoinChannel,
     setCreateChannelModalOpen,
+    setJoinChannelModalOpen,
   } = useChat();
 
   if (initializing) {
@@ -38,6 +43,7 @@ const ChatPage = () => {
           setCurrentChannelId={setCurrentChannelId}
           onLeave={onLeave}
           onOpenCreateChannelModal={setCreateChannelModalOpen}
+          onOpenJoinChannelModal={setJoinChannelModalOpen}
         />
       </div>
       <Row style={{ height: 'calc(100% - 40px)' }}>
@@ -61,6 +67,12 @@ const ChatPage = () => {
         loading={creatingChannel}
         onCreate={onCreateChannel}
         onOpenChange={setCreateChannelModalOpen}
+      />
+      <JoinChannelModal
+        open={joinChannelModalOpen}
+        loading={joiningChannel}
+        onJoin={onJoinChannel}
+        onOpenChange={setJoinChannelModalOpen}
       />
     </div>
   );
