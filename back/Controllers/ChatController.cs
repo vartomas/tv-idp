@@ -65,7 +65,8 @@ public class ChatController : ControllerBase
         List<Message> response = new();
         channels.ForEach(channel =>
         {
-            channel.Messages.ForEach(message => 
+            var latestMessages = channel.Messages.OrderByDescending(x => x.CreatedAt).Take(30).ToList();
+            latestMessages.ForEach(message => 
             {
                 response.Add(new Message
                 {
