@@ -48,7 +48,7 @@ const ChatPage = () => {
       </div>
       <Row style={{ height: 'calc(100% - 40px)' }}>
         <Col span={3}>
-          <ChatSideBar connectedUsers={connectedUsers} />
+          <ChatSideBar connectedUsers={connectedUsers[currentChannelId] || []} />
         </Col>
         <Col span={21} className="h-full">
           <div className="w-full pt-auto overflow-auto" style={{ height: 'calc(100% - 92px)' }} id="messagesContainer">
