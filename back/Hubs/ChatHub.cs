@@ -117,15 +117,23 @@ public sealed class ChatHub : Hub
         };
     }
 
-    public List<ConnectedUser> GetChannelUsers(int channelId)
+    public ChannelUsers GetChannelUsers(int channelId)
     {
         var connections = HubConnections.GetConnections();
         if (channelId == 0)
         {
-            return connections.Select(user => new ConnectedUser() { Id = user.Id, Username = user.Username }).ToList();
+            return new ChannelUsers 
+            {
+                ChannelId = channelId,
+                Users = connections.Select(user => new ConnectedUser() { Id = user.Id, Username = user.Username }).ToList()
+            };
         }
 
         var userIds = HubChannels.GetUsersInChannel(channelId);
-        return connections.FindAll(connection => userIds.Contains(connection.Id)).Select(user => new ConnectedUser() { Id = user.Id, Username = user.Username }).ToList();
+        return new ChannelUsers
+        {
+            ChannelId = channelId,
+            Users = connections.FindAll(connection => userIds.Contains(connection.Id)).Select(user => new ConnectedUser() { Id = user.Id, Username = user.Username }).ToList()
+        };
     }
 }

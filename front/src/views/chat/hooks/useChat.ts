@@ -1,12 +1,12 @@
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { useEffect, useState } from 'react';
-import { ChannelAction, ChannelDto, ConnectedUser, Message } from '../ChatModel';
+import { ChannelAction, ChannelDto, ChannelUsers, Message } from '../ChatModel';
 import { leaveChannel, getChannels, getMessages, joinChannel, createChannel } from '../../../core/api/chat';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 export const useChat = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
-  const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
+  const [connectedUsers, setConnectedUsers] = useState<Record<number, string[]>>({});
   const [currentChannelId, setCurrentChannelId] = useState(21);
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<ChannelDto[]>([]);
@@ -97,8 +97,14 @@ export const useChat = () => {
           connection.on('ReceiveMessage', (data: Message) => {
             setMessages((prev) => [...prev, data]);
           });
-          connection.on('UserList', (data: ConnectedUser[]) => {
-            setConnectedUsers(data.map((x) => x.username).sort((a, b) => a.localeCompare(b)));
+          connection.on('UserList', (data: ChannelUsers) => {
+            console.log(data);
+            setConnectedUsers((prev) => {
+              return {
+                ...prev,
+                [data.channelId]: [...data.users.map((x) => x.username).sort((a, b) => a.localeCompare(b))],
+              };
+            });
           });
         })
         .catch((err) => console.error(err));

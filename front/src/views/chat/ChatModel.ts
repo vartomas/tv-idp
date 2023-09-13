@@ -25,3 +25,8 @@ export interface ChannelAction {
   name: string;
   id: number;
 }
+
+export interface ChannelUsers {
+  channelId: number;
+  users: ConnectedUser[];
+}
