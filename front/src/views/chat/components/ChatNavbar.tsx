@@ -1,7 +1,7 @@
 import { Avatar, Button, Dropdown, MenuProps, Select } from 'antd';
 import { useUser } from '../../../core/state/useUser';
 import { useAuth } from '../../../core/hooks/useAuth';
-import { ChannelAction, ChannelDto } from '../ChatModel';
+import { ChannelAction, ChannelDto } from '../chatModel';
 import { FC } from 'react';
 import { UseMutateFunction } from '@tanstack/react-query';
 import { MoreOutlined } from '@ant-design/icons';

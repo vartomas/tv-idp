@@ -1,3 +1,9 @@
+import { useState } from 'react';
+import { ChessFigure } from '../chessModel';
+import { startingPositions } from '../utils/figure';
+
 export const useChess = () => {
-  return {};
+  const [figuresPositions, setFiguresPositions] = useState<ChessFigure[]>(startingPositions);
+
+  return { figuresPositions, setFiguresPositions };
 };

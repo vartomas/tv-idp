@@ -1,7 +1,7 @@
 import { Input } from 'antd';
 import { FC } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { ChatInputForm } from '../ChatModel';
+import { ChatInputForm } from '../chatModel';
 
 const { TextArea } = Input;
 

@@ -1,6 +1,6 @@
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { useEffect, useState } from 'react';
-import { ChannelAction, ChannelDto, ChannelUsers, Message } from '../ChatModel';
+import { ChannelAction, ChannelDto, ChannelUsers, Message } from '../chatModel';
 import { leaveChannel, getChannels, getMessages, joinChannel, createChannel } from '../../../core/api/chat';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
