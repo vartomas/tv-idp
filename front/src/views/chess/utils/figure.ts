@@ -1,4 +1,4 @@
-import { ChessFigure } from '../chessModel';
+import { ChessFigure, FigurePosition } from '../chessModel';
 import whitePawn from '../../../assets/figures/pawn_white.png';
 import blackPawn from '../../../assets/figures/pawn_black.png';
 import whiteRook from '../../../assets/figures/rook_white.png';
@@ -12,7 +12,7 @@ import blackQueen from '../../../assets/figures/queen_black.png';
 import whiteKing from '../../../assets/figures/king_white.png';
 import blackKing from '../../../assets/figures/king_black.png';
 
-export const getFigure = (figure: ChessFigure) => {
+export const getImage = (figure: ChessFigure) => {
   switch (figure.type) {
     case 'Pawn':
       return figure.color === 'white' ? whitePawn : blackPawn;
@@ -28,6 +28,9 @@ export const getFigure = (figure: ChessFigure) => {
       return figure.color === 'white' ? whiteKing : blackKing;
   }
 };
+
+export const isSamePosition = (position1: FigurePosition, position2: FigurePosition) =>
+  position1[0] === position2[0] && position1[1] === position2[1];
 
 const createFigure = (
   type: ChessFigure['type'],
