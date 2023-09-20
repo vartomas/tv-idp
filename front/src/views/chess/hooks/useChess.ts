@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChessFigure, FigurePosition } from '../chessModel';
 import { isSamePosition, startingPositions } from '../utils/figure';
+import { getFigureMoves } from '../utils/figureMoves';
 
 export const useChess = (gameId: string | undefined) => {
   const [playerColor, setPlayerColor] = useState<'white' | 'black'>('black');
@@ -17,5 +18,7 @@ export const useChess = (gameId: string | undefined) => {
     setSelectedFigure(foundFigure || null);
   };
 
-  return { playerColor, selectedFigure, figuresPositions, selectFigure };
+  const possibleMoves = !!selectedFigure && getFigureMoves(selectedFigure, figuresPositions);
+
+  return { playerColor, selectedFigure, possibleMoves, figuresPositions, selectFigure };
 };

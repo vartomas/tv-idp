@@ -1,4 +1,4 @@
-import { ChessFigure, FigurePosition, columns } from '../chessModel';
+import { AvailableFigureMoves, ChessFigure, FigurePosition, columns } from '../chessModel';
 import { isSamePosition } from './figure';
 
 const figureOnNextPosition = (nextPosition: FigurePosition, figuresPositions: ChessFigure[]) =>
@@ -6,9 +6,10 @@ const figureOnNextPosition = (nextPosition: FigurePosition, figuresPositions: Ch
 
 const outOfBoard = (nextPosition: FigurePosition) => nextPosition[1] < 1 || nextPosition[1] > 8 || !nextPosition[0];
 
-const getPawnMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): FigurePosition[] => {
+const getPawnMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): AvailableFigureMoves => {
   const [column, row] = figure.position;
   const moves: FigurePosition[] = [];
+  const captureMoves: FigurePosition[] = [];
 
   let allowedSteps = figure.hasMoved ? 1 : 2;
   let step = 1;
@@ -24,17 +25,45 @@ const getPawnMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fig
     step++;
   }
 
-  return moves;
+  const rightCapturePosition = (
+    figure.color === 'white'
+      ? [columns[columns.indexOf(column) + 1], row + 1]
+      : [columns[columns.indexOf(column) + 1], row - 1]
+  ) as FigurePosition;
+  if (figureOnNextPosition(rightCapturePosition, figuresPositions)) {
+    captureMoves.push(rightCapturePosition);
+  }
+
+  const leftCapturePosition = (
+    figure.color === 'white'
+      ? [columns[columns.indexOf(column) - 1], row + 1]
+      : [columns[columns.indexOf(column) - 1], row - 1]
+  ) as FigurePosition;
+  if (figureOnNextPosition(leftCapturePosition, figuresPositions)) {
+    captureMoves.push(leftCapturePosition);
+  }
+
+  return {
+    move: moves,
+    capture: captureMoves,
+  };
 };
 
-const getRookMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): FigurePosition[] => {
+const getRookMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): AvailableFigureMoves => {
   const [column, row] = figure.position;
   const moves: FigurePosition[] = [];
+  const captureMoves: FigurePosition[] = [];
 
   let upStep = 1;
   while (upStep < 8) {
     const nextPosition = [column, row + upStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -45,7 +74,13 @@ const getRookMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fig
   let bottomStep = 1;
   while (bottomStep < 8) {
     const nextPosition = [column, row - bottomStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -56,7 +91,13 @@ const getRookMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fig
   let colIndexForRight = columns.indexOf(column);
   while (columns[colIndexForRight]) {
     const nextPosition = [columns[colIndexForRight + 1], row] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -67,7 +108,13 @@ const getRookMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fig
   let colIndexForLeft = columns.indexOf(column);
   while (columns[colIndexForLeft]) {
     const nextPosition = [columns[colIndexForLeft - 1], row] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -75,65 +122,119 @@ const getRookMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fig
     colIndexForLeft--;
   }
 
-  return moves;
+  return {
+    move: moves,
+    capture: captureMoves,
+  };
 };
 
-const getKnightMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): FigurePosition[] => {
+const getKnightMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): AvailableFigureMoves => {
   const [column, row] = figure.position;
   const moves: FigurePosition[] = [];
+  const captureMoves: FigurePosition[] = [];
   const colIndex = columns.indexOf(column);
 
   const position1 = [columns[colIndex + 1], row + 2] as FigurePosition;
-  if (!figureOnNextPosition(position1, figuresPositions) && !outOfBoard(position1)) {
+  const figureOnPosition1 = figureOnNextPosition(position1, figuresPositions);
+  if (figureOnPosition1 && figureOnPosition1.color !== figure.color) {
+    captureMoves.push(position1);
+  }
+
+  if (!figureOnPosition1 && !outOfBoard(position1)) {
     moves.push(position1);
   }
 
   const position2 = [columns[colIndex - 1], row + 2] as FigurePosition;
+  const figureOnPosition2 = figureOnNextPosition(position2, figuresPositions);
+  if (figureOnPosition2 && figureOnPosition2.color !== figure.color) {
+    captureMoves.push(position2);
+  }
+
   if (!figureOnNextPosition(position2, figuresPositions) && !outOfBoard(position2)) {
     moves.push(position2);
   }
 
   const position3 = [columns[colIndex + 1], row - 2] as FigurePosition;
+  const figureOnPosition3 = figureOnNextPosition(position3, figuresPositions);
+  if (figureOnPosition3 && figureOnPosition3.color !== figure.color) {
+    captureMoves.push(position3);
+  }
+
   if (!figureOnNextPosition(position3, figuresPositions) && !outOfBoard(position3)) {
     moves.push(position3);
   }
 
   const position4 = [columns[colIndex - 1], row - 2] as FigurePosition;
+  const figureOnPosition4 = figureOnNextPosition(position4, figuresPositions);
+  if (figureOnPosition4 && figureOnPosition4.color !== figure.color) {
+    captureMoves.push(position4);
+  }
+
   if (!figureOnNextPosition(position4, figuresPositions) && !outOfBoard(position4)) {
     moves.push(position4);
   }
 
   const position5 = [columns[colIndex + 2], row + 1] as FigurePosition;
+  const figureOnPosition5 = figureOnNextPosition(position5, figuresPositions);
+  if (figureOnPosition5 && figureOnPosition5.color !== figure.color) {
+    captureMoves.push(position5);
+  }
+
   if (!figureOnNextPosition(position5, figuresPositions) && !outOfBoard(position5)) {
     moves.push(position5);
   }
 
   const position6 = [columns[colIndex + 2], row - 1] as FigurePosition;
+  const figureOnPosition6 = figureOnNextPosition(position6, figuresPositions);
+  if (figureOnPosition6 && figureOnPosition6.color !== figure.color) {
+    captureMoves.push(position6);
+  }
+
   if (!figureOnNextPosition(position6, figuresPositions) && !outOfBoard(position6)) {
     moves.push(position6);
   }
 
   const position7 = [columns[colIndex - 2], row + 1] as FigurePosition;
+  const figureOnPosition7 = figureOnNextPosition(position7, figuresPositions);
+  if (figureOnPosition7 && figureOnPosition7.color !== figure.color) {
+    captureMoves.push(position7);
+  }
+
   if (!figureOnNextPosition(position7, figuresPositions) && !outOfBoard(position7)) {
     moves.push(position7);
   }
 
   const position8 = [columns[colIndex - 2], row - 1] as FigurePosition;
+  const figureOnPosition8 = figureOnNextPosition(position8, figuresPositions);
+  if (figureOnPosition8 && figureOnPosition8.color !== figure.color) {
+    captureMoves.push(position8);
+  }
+
   if (!figureOnNextPosition(position8, figuresPositions) && !outOfBoard(position8)) {
     moves.push(position8);
   }
 
-  return moves;
+  return {
+    move: moves,
+    capture: captureMoves,
+  };
 };
 
-const getBishopMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): FigurePosition[] => {
+const getBishopMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): AvailableFigureMoves => {
   const [column, row] = figure.position;
   const moves: FigurePosition[] = [];
+  const captureMoves: FigurePosition[] = [];
 
   let upRightStep = 1;
   while (upRightStep < 8) {
     const nextPosition = [columns[columns.indexOf(column) + upRightStep], row + upRightStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -144,7 +245,13 @@ const getBishopMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): F
   let upLeftStep = 1;
   while (upLeftStep < 8) {
     const nextPosition = [columns[columns.indexOf(column) - upLeftStep], row + upLeftStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -155,7 +262,13 @@ const getBishopMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): F
   let bottomRightStep = 1;
   while (bottomRightStep < 8) {
     const nextPosition = [columns[columns.indexOf(column) + bottomRightStep], row - bottomRightStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -166,7 +279,13 @@ const getBishopMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): F
   let bottomLeftStep = 1;
   while (bottomLeftStep < 8) {
     const nextPosition = [columns[columns.indexOf(column) - bottomLeftStep], row - bottomLeftStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -174,17 +293,27 @@ const getBishopMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): F
     bottomLeftStep++;
   }
 
-  return moves;
+  return {
+    move: moves,
+    capture: captureMoves,
+  };
 };
 
-const getQueenMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): FigurePosition[] => {
+const getQueenMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): AvailableFigureMoves => {
   const [column, row] = figure.position;
   const moves: FigurePosition[] = [];
+  const captureMoves: FigurePosition[] = [];
 
   let upStep = 1;
   while (upStep < 8) {
     const nextPosition = [column, row + upStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -195,7 +324,13 @@ const getQueenMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fi
   let bottomStep = 1;
   while (bottomStep < 8) {
     const nextPosition = [column, row - bottomStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -206,7 +341,13 @@ const getQueenMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fi
   let colIndexForRight = columns.indexOf(column);
   while (columns[colIndexForRight]) {
     const nextPosition = [columns[colIndexForRight + 1], row] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -217,7 +358,13 @@ const getQueenMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fi
   let colIndexForLeft = columns.indexOf(column);
   while (columns[colIndexForLeft]) {
     const nextPosition = [columns[colIndexForLeft - 1], row] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -228,7 +375,13 @@ const getQueenMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fi
   let upRightStep = 1;
   while (upRightStep < 8) {
     const nextPosition = [columns[columns.indexOf(column) + upRightStep], row + upRightStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -239,7 +392,13 @@ const getQueenMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fi
   let upLeftStep = 1;
   while (upLeftStep < 8) {
     const nextPosition = [columns[columns.indexOf(column) - upLeftStep], row + upLeftStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -250,7 +409,13 @@ const getQueenMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fi
   let bottomRightStep = 1;
   while (bottomRightStep < 8) {
     const nextPosition = [columns[columns.indexOf(column) + bottomRightStep], row - bottomRightStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -261,7 +426,13 @@ const getQueenMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fi
   let bottomLeftStep = 1;
   while (bottomLeftStep < 8) {
     const nextPosition = [columns[columns.indexOf(column) - bottomLeftStep], row - bottomLeftStep] as FigurePosition;
-    if (figureOnNextPosition(nextPosition, figuresPositions) || outOfBoard(nextPosition)) {
+    const figureOnPosition = figureOnNextPosition(nextPosition, figuresPositions);
+    if (figureOnPosition && figureOnPosition.color !== figure.color) {
+      captureMoves.push(nextPosition);
+      break;
+    }
+
+    if (figureOnPosition || outOfBoard(nextPosition)) {
       break;
     }
 
@@ -269,57 +440,104 @@ const getQueenMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Fi
     bottomLeftStep++;
   }
 
-  return moves;
+  return {
+    move: moves,
+    capture: captureMoves,
+  };
 };
 
-const getKingMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): FigurePosition[] => {
+const getKingMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): AvailableFigureMoves => {
   const [column, row] = figure.position;
   const moves: FigurePosition[] = [];
+  const captureMoves: FigurePosition[] = [];
 
   const position1 = [columns[columns.indexOf(column) + 1], row + 1] as FigurePosition;
-  if (!figureOnNextPosition(position1, figuresPositions) && !outOfBoard(position1)) {
+  const figureOnPosition1 = figureOnNextPosition(position1, figuresPositions);
+  if (figureOnPosition1 && figureOnPosition1.color !== figure.color) {
+    captureMoves.push(position1);
+  }
+
+  if (!figureOnPosition1 && !outOfBoard(position1)) {
     moves.push(position1);
   }
 
   const position2 = [columns[columns.indexOf(column) - 1], row + 1] as FigurePosition;
-  if (!figureOnNextPosition(position2, figuresPositions) && !outOfBoard(position2)) {
+  const figureOnPosition2 = figureOnNextPosition(position2, figuresPositions);
+  if (figureOnPosition2 && figureOnPosition2.color !== figure.color) {
+    captureMoves.push(position2);
+  }
+
+  if (!figureOnPosition2 && !outOfBoard(position2)) {
     moves.push(position2);
   }
 
   const position3 = [columns[columns.indexOf(column) + 1], row - 1] as FigurePosition;
-  if (!figureOnNextPosition(position3, figuresPositions) && !outOfBoard(position3)) {
+  const figureOnPosition3 = figureOnNextPosition(position3, figuresPositions);
+  if (figureOnPosition3 && figureOnPosition3.color !== figure.color) {
+    captureMoves.push(position3);
+  }
+
+  if (!figureOnPosition3 && !outOfBoard(position3)) {
     moves.push(position3);
   }
 
   const position4 = [columns[columns.indexOf(column) - 1], row - 1] as FigurePosition;
-  if (!figureOnNextPosition(position4, figuresPositions) && !outOfBoard(position4)) {
+  const figureOnPosition4 = figureOnNextPosition(position4, figuresPositions);
+  if (figureOnPosition4 && figureOnPosition4.color !== figure.color) {
+    captureMoves.push(position4);
+  }
+
+  if (!figureOnPosition4 && !outOfBoard(position4)) {
     moves.push(position4);
   }
 
   const position5 = [columns[columns.indexOf(column) + 1], row] as FigurePosition;
-  if (!figureOnNextPosition(position5, figuresPositions) && !outOfBoard(position5)) {
+  const figureOnPosition5 = figureOnNextPosition(position5, figuresPositions);
+  if (figureOnPosition5 && figureOnPosition5.color !== figure.color) {
+    captureMoves.push(position5);
+  }
+
+  if (!figureOnPosition5 && !outOfBoard(position5)) {
     moves.push(position5);
   }
 
   const position6 = [columns[columns.indexOf(column) - 1], row] as FigurePosition;
-  if (!figureOnNextPosition(position6, figuresPositions) && !outOfBoard(position6)) {
+  const figureOnPosition6 = figureOnNextPosition(position6, figuresPositions);
+  if (figureOnPosition6 && figureOnPosition6.color !== figure.color) {
+    captureMoves.push(position6);
+  }
+
+  if (!figureOnPosition6 && !outOfBoard(position6)) {
     moves.push(position6);
   }
 
   const position7 = [columns[columns.indexOf(column)], row + 1] as FigurePosition;
-  if (!figureOnNextPosition(position7, figuresPositions) && !outOfBoard(position7)) {
+  const figureOnPosition7 = figureOnNextPosition(position7, figuresPositions);
+  if (figureOnPosition7 && figureOnPosition7.color !== figure.color) {
+    captureMoves.push(position7);
+  }
+
+  if (!figureOnPosition7 && !outOfBoard(position7)) {
     moves.push(position7);
   }
 
   const position8 = [columns[columns.indexOf(column)], row - 1] as FigurePosition;
-  if (!figureOnNextPosition(position8, figuresPositions) && !outOfBoard(position8)) {
+  const figureOnPosition8 = figureOnNextPosition(position8, figuresPositions);
+  if (figureOnPosition8 && figureOnPosition8.color !== figure.color) {
+    captureMoves.push(position8);
+  }
+
+  if (!figureOnPosition8 && !outOfBoard(position8)) {
     moves.push(position8);
   }
 
-  return moves;
+  return {
+    move: moves,
+    capture: captureMoves,
+  };
 };
 
-export const getFigureMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): FigurePosition[] => {
+export const getFigureMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): AvailableFigureMoves => {
   switch (figure.type) {
     case 'Pawn':
       return getPawnMoves(figure, figuresPositions);

@@ -4,12 +4,11 @@ import BoardTile from './components/BoardTile';
 import { useChess } from './hooks/useChess';
 import { Image } from 'antd';
 import { getImage, isSamePosition } from './utils/figure';
-import { getFigureMoves } from './utils/figureMoves';
 
 const ChessPage = () => {
   const params = useParams();
 
-  const { playerColor, selectedFigure, figuresPositions, selectFigure } = useChess(params.gameId);
+  const { playerColor, selectedFigure, possibleMoves, figuresPositions, selectFigure } = useChess(params.gameId);
 
   const black = playerColor === 'black';
 
@@ -41,10 +40,8 @@ const ChessPage = () => {
                 key={`${col}-${row}`}
                 selected={!!selectedFigure && isSamePosition(selectedFigure.position, [col, row])}
                 position={[col, row]}
-                showPossibleMove={
-                  !!selectedFigure &&
-                  getFigureMoves(selectedFigure, figuresPositions).some((x) => isSamePosition(x, [col, row]))
-                }
+                showPossibleMove={possibleMoves && possibleMoves.move.some((x) => isSamePosition(x, [col, row]))}
+                showPossibleCapture={possibleMoves && possibleMoves.capture.some((x) => isSamePosition(x, [col, row]))}
                 onSelect={selectFigure}
               >
                 {renderFigure([col, row])}

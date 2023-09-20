@@ -5,11 +5,12 @@ interface Props {
   selected: boolean;
   position: FigurePosition;
   showPossibleMove: boolean;
+  showPossibleCapture: boolean;
   onSelect: (position: FigurePosition) => void;
   children: React.ReactNode;
 }
 
-const BoardTile: FC<Props> = ({ selected, position, showPossibleMove, onSelect, children }) => {
+const BoardTile: FC<Props> = ({ selected, position, showPossibleMove, showPossibleCapture, onSelect, children }) => {
   const getColor = () => {
     const light = 'bg-amber-200';
     const dark = 'bg-amber-500';
@@ -24,8 +25,13 @@ const BoardTile: FC<Props> = ({ selected, position, showPossibleMove, onSelect, 
       onClick={() => onSelect(position)}
     >
       {selected && <div className="absolute bg-green-800 bg-opacity-20 top-0 bottom-0 left-0 right-0" />}
-      {children}
       {showPossibleMove && <div className="w-1/6 h-1/6 rounded-full bg-opacity-20 bg-black" />}
+      {showPossibleCapture && (
+        <div className="absolute top-0 bottom-0 left-0 right-0 bg-opacity-20 bg-black">
+          <div className={`w-full h-full rounded-3xl ${getColor()}`} />
+        </div>
+      )}
+      {children}
     </div>
   );
 };
