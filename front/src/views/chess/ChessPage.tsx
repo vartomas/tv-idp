@@ -8,7 +8,9 @@ import { getImage, isSamePosition } from './utils/figure';
 const ChessPage = () => {
   const params = useParams();
 
-  const { playerColor, selectedFigure, possibleMoves, figuresPositions, selectFigure } = useChess(params.gameId);
+  const { playerColor, selectedFigure, possibleMoves, figuresPositions, selectFigure, moveFigure } = useChess(
+    params.gameId
+  );
 
   const black = playerColor === 'black';
 
@@ -43,6 +45,7 @@ const ChessPage = () => {
                 showPossibleMove={possibleMoves && possibleMoves.move.some((x) => isSamePosition(x, [col, row]))}
                 showPossibleCapture={possibleMoves && possibleMoves.capture.some((x) => isSamePosition(x, [col, row]))}
                 onSelect={selectFigure}
+                onMove={moveFigure}
               >
                 {renderFigure([col, row])}
               </BoardTile>

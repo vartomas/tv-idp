@@ -20,5 +20,29 @@ export const useChess = (gameId: string | undefined) => {
 
   const possibleMoves = !!selectedFigure && getFigureMoves(selectedFigure, figuresPositions);
 
-  return { playerColor, selectedFigure, possibleMoves, figuresPositions, selectFigure };
+  const moveFigure = (position: FigurePosition) => {
+    const figureInPosition = figuresPositions.find((figure) => isSamePosition(figure.position, position));
+
+    const updatedPositions = figuresPositions.map((x) => {
+      if (x.id === selectedFigure?.id) {
+        return {
+          ...x,
+          position,
+          hasMoved: true,
+        };
+      }
+
+      return x;
+    });
+
+    if (figureInPosition) {
+      const index = figuresPositions.findIndex((figure) => figure.id === figureInPosition.id);
+      updatedPositions.splice(index, 1);
+    }
+
+    setSelectedFigure(null);
+    setFiguresPositions(updatedPositions);
+  };
+
+  return { playerColor, selectedFigure, possibleMoves, figuresPositions, selectFigure, moveFigure };
 };
