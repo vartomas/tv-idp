@@ -30,7 +30,8 @@ const getPawnMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Ava
       ? [columns[columns.indexOf(column) + 1], row + 1]
       : [columns[columns.indexOf(column) + 1], row - 1]
   ) as FigurePosition;
-  if (figureOnNextPosition(rightCapturePosition, figuresPositions)) {
+  const figureOnRight = figureOnNextPosition(rightCapturePosition, figuresPositions);
+  if (figureOnRight && figureOnRight.color !== figure.color) {
     captureMoves.push(rightCapturePosition);
   }
 
@@ -39,7 +40,8 @@ const getPawnMoves = (figure: ChessFigure, figuresPositions: ChessFigure[]): Ava
       ? [columns[columns.indexOf(column) - 1], row + 1]
       : [columns[columns.indexOf(column) - 1], row - 1]
   ) as FigurePosition;
-  if (figureOnNextPosition(leftCapturePosition, figuresPositions)) {
+  const figureOnLeft = figureOnNextPosition(leftCapturePosition, figuresPositions);
+  if (figureOnLeft && figureOnLeft.color !== figure.color) {
     captureMoves.push(leftCapturePosition);
   }
 
