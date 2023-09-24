@@ -24,3 +24,8 @@ export interface AvailableFigureMoves {
   move: FigurePosition[];
   capture: FigurePosition[];
 }
+
+export interface ChessGameDto {
+  id: number;
+  color: 'white' | 'black';
+}

@@ -7,7 +7,6 @@ import Register from '../../views/Register';
 import ChatPage from '../../views/chat/ChatPage';
 import { useUser } from '../state/useUser';
 import PageNotFound from '../../views/PageNotFound';
-import ChessPage from '../../views/chess/ChessPage';
 
 const Navigator = () => {
   const username = useUser((state) => state.username);
@@ -32,10 +31,7 @@ const Navigator = () => {
     <Route key="/register" path="/register" element={<Register />} />,
   ];
 
-  const authorizedRoutes = [
-    <Route key="/" path="/" element={<ChatPage />} />,
-    <Route key="chess" path="chess/:gameId" element={<ChessPage />} />,
-  ];
+  const authorizedRoutes = [<Route key="/" path="/" element={<ChatPage />} />];
 
   return (
     <Routes>

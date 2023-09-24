@@ -10,5 +10,6 @@ namespace TV_IDP.Services
         public DbSet<User> Users { get; set; }
         public DbSet<ChatChannel> ChatChannels { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<ChessGame> ChessGames { get; set; }
     }
 }

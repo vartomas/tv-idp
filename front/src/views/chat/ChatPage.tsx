@@ -7,6 +7,7 @@ import ChatNavbar from './components/ChatNavbar';
 import Loader from '../Loader';
 import CreateChannelModal from './components/CreateChannelModal';
 import JoinChannelModal from './components/JoinChannelModal';
+import GameModal from '../../components/GameModal';
 
 const ChatPage = () => {
   const {
@@ -20,13 +21,16 @@ const ChatPage = () => {
     connectedUsers,
     createChannelModalOpen,
     joinChannelModalOpen,
+    currentGameId,
     sendMessage,
     setCurrentChannelId,
     onLeaveChannel,
     onCreateChannel,
     onJoinChannel,
+    onInviteChess,
     setCreateChannelModalOpen,
     setJoinChannelModalOpen,
+    onGameModalClose,
   } = useChat();
 
   if (initializing) {
@@ -48,7 +52,7 @@ const ChatPage = () => {
       </div>
       <Row style={{ height: 'calc(100% - 40px)' }}>
         <Col span={3}>
-          <ChatSideBar connectedUsers={connectedUsers[currentChannelId] || []} />
+          <ChatSideBar connectedUsers={connectedUsers[currentChannelId] || []} onInviteChess={onInviteChess} />
         </Col>
         <Col span={21} className="h-full">
           <div className="w-full pt-auto overflow-auto" style={{ height: 'calc(100% - 92px)' }} id="messagesContainer">
@@ -74,6 +78,7 @@ const ChatPage = () => {
         onJoin={onJoinChannel}
         onOpenChange={setJoinChannelModalOpen}
       />
+      <GameModal gameId={currentGameId} onClose={onGameModalClose} />
     </div>
   );
 };

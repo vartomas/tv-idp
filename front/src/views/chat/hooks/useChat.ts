@@ -1,17 +1,18 @@
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { useEffect, useState } from 'react';
-import { ChannelAction, ChannelDto, ChannelUsers, Message } from '../chatModel';
+import { ChannelAction, ChannelDto, ChannelUsers, ConnectedUser, Message } from '../chatModel';
 import { leaveChannel, getChannels, getMessages, joinChannel, createChannel } from '../../../core/api/chat';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 export const useChat = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
-  const [connectedUsers, setConnectedUsers] = useState<Record<number, string[]>>({});
+  const [connectedUsers, setConnectedUsers] = useState<Record<number, ConnectedUser[]>>({});
   const [currentChannelId, setCurrentChannelId] = useState(21);
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<ChannelDto[]>([]);
   const [createChannelModalOpen, setCreateChannelModalOpen] = useState(false);
   const [joinChannelModalOpen, setJoinChannelModalOpen] = useState(false);
+  const [currentGameId, setCurrentGameId] = useState<number | null>(1);
 
   const { isLoading: channelsLoading } = useQuery<ChannelDto[]>({
     queryKey: ['channels'],
@@ -98,13 +99,15 @@ export const useChat = () => {
             setMessages((prev) => [...prev, data]);
           });
           connection.on('UserList', (data: ChannelUsers) => {
-            console.log(data);
             setConnectedUsers((prev) => {
               return {
                 ...prev,
-                [data.channelId]: [...data.users.map((x) => x.username).sort((a, b) => a.localeCompare(b))],
+                [data.channelId]: [...data.users.sort((a, b) => a.username.localeCompare(b.username))],
               };
             });
+          });
+          connection.on('ReceiveChessGameInvite', (gameId: number) => {
+            console.log('ReceiveChessGameInvite', gameId);
           });
         })
         .catch((err) => console.error(err));
@@ -145,6 +148,16 @@ export const useChat = () => {
     join(parseInt(id));
   };
 
+  const handleInviteChess = (userId: number) => {
+    if (connection?.state === 'Connected') {
+      connection.send('inviteForChessGame', userId);
+    }
+  };
+
+  const handleCloseGameModal = () => {
+    setCurrentGameId(null);
+  };
+
   return {
     initializing: channelsLoading || messagesLoading,
     creatingChannel,
@@ -156,12 +169,15 @@ export const useChat = () => {
     connectedUsers,
     createChannelModalOpen,
     joinChannelModalOpen,
+    currentGameId,
     sendMessage,
     setCurrentChannelId,
     onLeaveChannel: leave,
     onCreateChannel: handleCreateChannel,
     onJoinChannel: handleJoinChannel,
+    onInviteChess: handleInviteChess,
     setCreateChannelModalOpen,
     setJoinChannelModalOpen,
+    onGameModalClose: handleCloseGameModal,
   };
 };

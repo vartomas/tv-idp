@@ -3,7 +3,7 @@ import { ChessFigure, FigurePosition } from '../chessModel';
 import { isSamePosition, startingPositions } from '../utils/figure';
 import { getFigureMoves } from '../utils/figureMoves';
 
-export const useChess = (gameId: string | undefined) => {
+export const useChess = (gameId: number | null) => {
   const [playerColor, setPlayerColor] = useState<'white' | 'black'>('black');
   const [figuresPositions, setFiguresPositions] = useState<ChessFigure[]>(startingPositions);
   const [selectedFigure, setSelectedFigure] = useState<ChessFigure | null>(null);

@@ -78,6 +78,39 @@ public sealed class ChatHub : Hub
         await Clients.Group(channelId.ToString()).SendAsync("ReceiveMessage", CreateChatMessage(MessageType.UserMessage, channelId, message));
     }
 
+    public async Task InviteForChessGame(int opponentId)
+    {
+        var currentUser = GetUser();
+        var opponentUser = await _context.Users.FindAsync(opponentId);
+
+        if (opponentUser is null || currentUser is null)
+        {
+            throw new Exception("User not found");
+        }
+
+        User[] users = { currentUser, opponentUser };
+        User randomUser = users[new Random().Next(users.Length)];
+
+        var chessGame = new ChessGame()
+        {
+            WhiteUserId = randomUser.Id,
+            BlackUserId = users[0].Id == randomUser.Id ? users[1].Id : users[0].Id,
+        };
+
+        await _context.ChessGames.AddAsync(chessGame);
+        await _context.SaveChangesAsync();
+
+        await Clients.Caller.SendAsync("ReceiveChessGameInvite", chessGame.Id);
+        var opponentConnectionId = HubConnections.GetConnections().Find((user) => user.Id == opponentId)?.ConnectionId;
+
+        if (opponentConnectionId is null)
+        {
+            throw new Exception("User not connected");
+        }
+
+        await Clients.Client(opponentConnectionId).SendAsync("ReceiveChessGameInvite", chessGame.Id);
+    }
+
     public User GetUser()
     {
         if (Context.GetHttpContext()?.Items["User"] is not User user)

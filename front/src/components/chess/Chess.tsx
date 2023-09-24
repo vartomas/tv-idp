@@ -1,16 +1,17 @@
-import { useParams } from 'react-router-dom';
 import { FigurePosition, columns, rows } from './chessModel';
 import BoardTile from './components/BoardTile';
 import { useChess } from './hooks/useChess';
 import { Image } from 'antd';
 import { getImage, isSamePosition } from './utils/figure';
+import { FC } from 'react';
 
-const ChessPage = () => {
-  const params = useParams();
+interface Props {
+  gameId: number | null;
+  borderLength: number;
+}
 
-  const { playerColor, selectedFigure, possibleMoves, figuresPositions, selectFigure, moveFigure } = useChess(
-    params.gameId
-  );
+const Chess: FC<Props> = ({ gameId, borderLength }) => {
+  const { playerColor, selectedFigure, possibleMoves, figuresPositions, selectFigure, moveFigure } = useChess(gameId);
 
   const black = playerColor === 'black';
 
@@ -34,7 +35,7 @@ const ChessPage = () => {
 
   return (
     <div className="h-100 w-100">
-      <div style={{ width: '100vmin', height: '100vmin' }} className={`m-auto p-3${black ? ' rotate-180' : ''}`}>
+      <div style={{ width: borderLength, height: borderLength }} className={`m-auto p-3${black ? ' rotate-180' : ''}`}>
         {rows.map((row) => (
           <div key={row} className="flex" style={{ height: 'calc(100% / 8)' }}>
             {columns.map((col) => (
@@ -57,4 +58,4 @@ const ChessPage = () => {
   );
 };
 
-export default ChessPage;
+export default Chess;
