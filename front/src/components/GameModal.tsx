@@ -3,7 +3,7 @@ import { FC } from 'react';
 import Chess from './chess/Chess';
 
 interface Props {
-  gameId: number | null;
+  gameId: number;
   onClose: () => void;
 }
 

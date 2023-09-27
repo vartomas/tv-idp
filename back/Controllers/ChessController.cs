@@ -18,8 +18,8 @@ public class ChessController : ControllerBase
         _context = context;
     }
 
-    [HttpGet(nameof(GetChessGame))]
-    public async Task<IActionResult> GetChessGame(int gameId)
+    [HttpGet(nameof(GetChessGameDetails))]
+    public async Task<IActionResult> GetChessGameDetails(int gameId)
     {
         var chessGame = await _context.ChessGames.FirstOrDefaultAsync(x => x.Id == gameId);
 

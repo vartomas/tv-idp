@@ -1,12 +1,24 @@
 import { useState } from 'react';
-import { ChessFigure, FigurePosition } from '../chessModel';
+import { ChessFigure, ChessGameDto, FigurePosition } from '../chessModel';
 import { isSamePosition, startingPositions } from '../utils/figure';
 import { getFigureMoves } from '../utils/figureMoves';
+import { getChessGameDetails } from '../../../core/api/chess';
+import { useQuery } from '@tanstack/react-query';
 
-export const useChess = (gameId: number | null) => {
-  const [playerColor, setPlayerColor] = useState<'white' | 'black'>('black');
+export const useChess = (gameId: number) => {
+  const [playerColor, setPlayerColor] = useState<'white' | 'black'>();
   const [figuresPositions, setFiguresPositions] = useState<ChessFigure[]>(startingPositions);
   const [selectedFigure, setSelectedFigure] = useState<ChessFigure | null>(null);
+
+  const { isLoading } = useQuery<ChessGameDto>({
+    queryKey: [`chessGameDetails-${gameId}}`],
+    queryFn: () => getChessGameDetails(gameId),
+    staleTime: Infinity,
+    cacheTime: Infinity,
+    onSuccess: (data) => {
+      setPlayerColor(data.color);
+    },
+  });
 
   const selectFigure = (position: FigurePosition) => {
     const foundFigure = figuresPositions.find((figure) => isSamePosition(figure.position, position));
@@ -44,5 +56,5 @@ export const useChess = (gameId: number | null) => {
     setFiguresPositions(updatedPositions);
   };
 
-  return { playerColor, selectedFigure, possibleMoves, figuresPositions, selectFigure, moveFigure };
+  return { playerColor, selectedFigure, possibleMoves, figuresPositions, isLoading, selectFigure, moveFigure };
 };

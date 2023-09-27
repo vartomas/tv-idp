@@ -4,14 +4,16 @@ import { useChess } from './hooks/useChess';
 import { Image } from 'antd';
 import { getImage, isSamePosition } from './utils/figure';
 import { FC } from 'react';
+import GameLoader from '../GameLoader';
 
 interface Props {
-  gameId: number | null;
+  gameId: number;
   borderLength: number;
 }
 
 const Chess: FC<Props> = ({ gameId, borderLength }) => {
-  const { playerColor, selectedFigure, possibleMoves, figuresPositions, selectFigure, moveFigure } = useChess(gameId);
+  const { playerColor, selectedFigure, possibleMoves, figuresPositions, isLoading, selectFigure, moveFigure } =
+    useChess(gameId);
 
   const black = playerColor === 'black';
 
@@ -32,6 +34,10 @@ const Chess: FC<Props> = ({ gameId, borderLength }) => {
       </span>
     );
   };
+
+  if (isLoading) {
+    return <GameLoader />;
+  }
 
   return (
     <div className="h-100 w-100">

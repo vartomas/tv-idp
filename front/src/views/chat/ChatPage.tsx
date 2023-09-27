@@ -78,7 +78,7 @@ const ChatPage = () => {
         onJoin={onJoinChannel}
         onOpenChange={setJoinChannelModalOpen}
       />
-      <GameModal gameId={currentGameId} onClose={onGameModalClose} />
+      {currentGameId && <GameModal gameId={currentGameId} onClose={onGameModalClose} />}
     </div>
   );
 };
