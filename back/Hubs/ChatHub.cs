@@ -100,7 +100,6 @@ public sealed class ChatHub : Hub
         await _context.ChessGames.AddAsync(chessGame);
         await _context.SaveChangesAsync();
 
-        await Clients.Caller.SendAsync("ReceiveChessGameInvite", chessGame.Id);
         var opponentConnectionId = HubConnections.GetConnections().Find((user) => user.Id == opponentId)?.ConnectionId;
 
         if (opponentConnectionId is null)
@@ -108,7 +107,13 @@ public sealed class ChatHub : Hub
             throw new Exception("User not connected");
         }
 
-        await Clients.Client(opponentConnectionId).SendAsync("ReceiveChessGameInvite", chessGame.Id);
+        var inviteMessage = new
+        {
+            chessGame.Id,
+            InvitedBy = currentUser.Username
+        };
+
+        await Clients.Client(opponentConnectionId).SendAsync("ReceiveChessGameInvite", inviteMessage);
     }
 
     public User GetUser()

@@ -22,6 +22,7 @@ const ChatPage = () => {
     createChannelModalOpen,
     joinChannelModalOpen,
     currentGameId,
+    receivedInvites,
     sendMessage,
     setCurrentChannelId,
     onLeaveChannel,
@@ -44,6 +45,7 @@ const ChatPage = () => {
           leavingChannel={leavingChannel}
           currentChannelId={currentChannelId}
           availableChannels={availableChannels}
+          receivedInvites={receivedInvites}
           setCurrentChannelId={setCurrentChannelId}
           onLeave={onLeaveChannel}
           onOpenCreateChannelModal={setCreateChannelModalOpen}

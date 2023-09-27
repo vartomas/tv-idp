@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { ChannelAction, ChannelDto, ChannelUsers, ConnectedUser, Message } from '../chatModel';
 import { leaveChannel, getChannels, getMessages, joinChannel, createChannel } from '../../../core/api/chat';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { InviteMessage } from '../../../components/chess/chessModel';
 
 export const useChat = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
@@ -12,7 +13,8 @@ export const useChat = () => {
   const [channels, setChannels] = useState<ChannelDto[]>([]);
   const [createChannelModalOpen, setCreateChannelModalOpen] = useState(false);
   const [joinChannelModalOpen, setJoinChannelModalOpen] = useState(false);
-  const [currentGameId, setCurrentGameId] = useState<number | null>(1);
+  const [currentGameId, setCurrentGameId] = useState<number | null>(null);
+  const [receivedInvites, setReceivedInvites] = useState<InviteMessage[]>([]);
 
   const { isLoading: channelsLoading } = useQuery<ChannelDto[]>({
     queryKey: ['channels'],
@@ -106,8 +108,8 @@ export const useChat = () => {
               };
             });
           });
-          connection.on('ReceiveChessGameInvite', (gameId: number) => {
-            console.log('ReceiveChessGameInvite', gameId);
+          connection.on('ReceiveChessGameInvite', (message: InviteMessage) => {
+            setReceivedInvites((prev) => [...prev, message]);
           });
         })
         .catch((err) => console.error(err));
@@ -170,6 +172,7 @@ export const useChat = () => {
     createChannelModalOpen,
     joinChannelModalOpen,
     currentGameId,
+    receivedInvites,
     sendMessage,
     setCurrentChannelId,
     onLeaveChannel: leave,

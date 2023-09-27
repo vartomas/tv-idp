@@ -29,3 +29,8 @@ export interface ChessGameDto {
   id: number;
   color: 'white' | 'black';
 }
+
+export interface InviteMessage {
+  gameId: number;
+  invitedBy: string;
+}
