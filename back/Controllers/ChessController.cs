@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TV_IDP.Access.Models;
+using TV_IDP.Authorization;
 using TV_IDP.Services;
 
 namespace TV_IDP.Controllers;

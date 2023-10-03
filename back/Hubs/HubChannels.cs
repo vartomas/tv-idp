@@ -2,35 +2,41 @@
 
 public static class HubChannels
 {
-    private static readonly Dictionary<int, List<int>> _channels = new();
+    private static readonly Dictionary<int, List<int>> channels = new();
 
     public static void AddUserToChannel(int channelId, int userId)
     {
-        if (!_channels.ContainsKey(channelId))
+        if (!channels.ContainsKey(channelId))
         {
-            _channels[channelId] = new List<int>();
+            channels[channelId] = new List<int>();
         }
 
-        _channels[channelId].Add(userId);
+        lock (channels)
+        {
+            channels[channelId].Add(userId);
+        }
     }
 
     public static void RemoveUserFromChannel(int channelId, int userId)
     {
-        if (!_channels.ContainsKey(channelId))
+        if (!channels.ContainsKey(channelId))
         {
             return;
         }
 
-        _channels[channelId].Remove(userId);
+        lock (channels)
+        {
+            channels[channelId].Remove(userId);
+        }
     }
 
     public static List<int> GetUsersInChannel(int channelId)
     {
-        if (!_channels.ContainsKey(channelId))
+        if (!channels.ContainsKey(channelId))
         {
             return new List<int>();
         }
 
-        return _channels[channelId];
+        return channels[channelId];
     }
 }

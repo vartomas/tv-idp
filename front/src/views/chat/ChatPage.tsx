@@ -29,6 +29,7 @@ const ChatPage = () => {
     onCreateChannel,
     onJoinChannel,
     onInviteChess,
+    onAcceptInvite,
     setCreateChannelModalOpen,
     setJoinChannelModalOpen,
     onGameModalClose,
@@ -50,6 +51,7 @@ const ChatPage = () => {
           onLeave={onLeaveChannel}
           onOpenCreateChannelModal={setCreateChannelModalOpen}
           onOpenJoinChannelModal={setJoinChannelModalOpen}
+          onAcceptInvite={onAcceptInvite}
         />
       </div>
       <Row style={{ height: 'calc(100% - 40px)' }}>

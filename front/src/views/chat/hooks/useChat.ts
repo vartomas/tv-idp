@@ -111,6 +111,9 @@ export const useChat = () => {
           connection.on('ReceiveChessGameInvite', (message: InviteMessage) => {
             setReceivedInvites((prev) => [...prev, message]);
           });
+          connection.on('ReceiveChessGameAccept', (gameId: number) => {
+            setCurrentGameId(gameId);
+          });
         })
         .catch((err) => console.error(err));
     }
@@ -156,6 +159,13 @@ export const useChat = () => {
     }
   };
 
+  const handleInviteAccept = (gameId: number) => {
+    if (connection?.state === 'Connected') {
+      connection.send('acceptGameInvite', gameId);
+      setCurrentGameId(gameId);
+    }
+  };
+
   const handleCloseGameModal = () => {
     setCurrentGameId(null);
   };
@@ -179,6 +189,7 @@ export const useChat = () => {
     onCreateChannel: handleCreateChannel,
     onJoinChannel: handleJoinChannel,
     onInviteChess: handleInviteChess,
+    onAcceptInvite: handleInviteAccept,
     setCreateChannelModalOpen,
     setJoinChannelModalOpen,
     onGameModalClose: handleCloseGameModal,

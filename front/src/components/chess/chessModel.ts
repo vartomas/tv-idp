@@ -31,6 +31,6 @@ export interface ChessGameDto {
 }
 
 export interface InviteMessage {
-  gameId: number;
+  id: number;
   invitedBy: string;
 }

@@ -116,6 +116,26 @@ public sealed class ChatHub : Hub
         await Clients.Client(opponentConnectionId).SendAsync("ReceiveChessGameInvite", inviteMessage);
     }
 
+    public async Task AcceptGameInvite(int gameId)
+    {
+        var currentUser = GetUser();
+        var chessGame = await _context.ChessGames.FindAsync(gameId);
+
+        if (chessGame is null || currentUser is null)
+        {
+            throw new Exception("User or game not found");
+        }
+
+        var opponentConnectionId = HubConnections.GetConnections().Find((user) => currentUser.Id == chessGame.WhiteUserId ? user.Id == chessGame.BlackUserId : user.Id == chessGame.WhiteUserId)?.ConnectionId;
+
+        if (opponentConnectionId is null)
+        {
+            throw new Exception("User not connected");
+        }
+
+        await Clients.Client(opponentConnectionId).SendAsync("ReceiveChessGameAccept", chessGame.Id);
+    }
+
     public User GetUser()
     {
         if (Context.GetHttpContext()?.Items["User"] is not User user)
