@@ -1,12 +1,12 @@
-﻿using TV_IDP.Models;
+﻿using TV_IDP.Models.Hub;
 
-namespace TV_IDP.Hubs;
+namespace TV_IDP.Services;
 
-public static class HubConnections
+public sealed class Connections
 {
     private static readonly List<HubConnection> connections = new();
 
-    public static void AddUser(HubConnection user)
+    public void AddUser(HubConnection user)
     {
         lock (connections)
         {
@@ -14,7 +14,7 @@ public static class HubConnections
         }
     }
 
-    public static void RemoveUser(string connectionId)
+    public void RemoveUser(string connectionId)
     {
         lock (connections)
         {
@@ -22,7 +22,7 @@ public static class HubConnections
         }
     }
 
-    public static List<HubConnection> GetConnections()
+    public List<HubConnection> GetConnections()
     {
         return connections;
     }

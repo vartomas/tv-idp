@@ -1,4 +1,4 @@
-﻿namespace TV_IDP.Models
+﻿namespace TV_IDP.Models.Hub
 {
     public class ConnectedUser
     {

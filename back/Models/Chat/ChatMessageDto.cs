@@ -1,6 +1,6 @@
-﻿namespace TV_IDP.Models
+﻿namespace TV_IDP.Models.Chat
 {
-    public class Message
+    public class ChatMessageDto
     {
         public int Id { get; set; }
         public required string Body { get; set; }

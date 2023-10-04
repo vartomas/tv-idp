@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TV_IDP.Access.Models;
+using TV_IDP.Access.Models.Chat;
 using TV_IDP.Authorization;
-using TV_IDP.Models;
+using TV_IDP.Models.Chat;
 using TV_IDP.Services;
 
 namespace TV_IDP.Controllers;
@@ -12,11 +13,11 @@ namespace TV_IDP.Controllers;
 [Route("api/[controller]")]
 public class ChatController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly AppDbContext _db;
 
-    public ChatController(AppDbContext context)
+    public ChatController(AppDbContext db)
     {
-        _context = context;
+        _db = db;
     }
 
     [HttpGet(nameof(GetChannels))]
@@ -29,7 +30,7 @@ public class ChatController : ControllerBase
             return BadRequest(new { message = "Bad request" });
         }
 
-        var channels = await _context.ChatChannels
+        var channels = await _db.ChatChannels
             .Where(channel => channel.Users.Contains(user))
             .Include(x => x.Users)
             .ToListAsync();
@@ -56,19 +57,19 @@ public class ChatController : ControllerBase
             return BadRequest(new { message = "Bad request" });
         }
 
-        var channels = await _context.ChatChannels
+        var channels = await _db.ChatChannels
             .Where(channel => channel.Users.Contains(user))
             .Include(x => x.Messages)
             .ThenInclude(x => x.User)
             .ToListAsync();
 
-        List<Message> response = new();
+        List<Models.Chat.ChatMessageDto> response = new();
         channels.ForEach(channel =>
         {
             var latestMessages = channel.Messages.OrderByDescending(x => x.CreatedAt).Take(30).ToList();
             latestMessages.ForEach(message => 
             {
-                response.Add(new Message
+                response.Add(new Models.Chat.ChatMessageDto
                 {
                     Id = message.Id,
                     Body = message.Body,
@@ -97,8 +98,8 @@ public class ChatController : ControllerBase
             Users = new List<User> { user }
         };
 
-        await _context.ChatChannels.AddAsync(channel);
-        await _context.SaveChangesAsync();
+        await _db.ChatChannels.AddAsync(channel);
+        await _db.SaveChangesAsync();
 
         return Ok(new { message = "Channel created", channel.Id, channel.Name });
     }
@@ -113,7 +114,7 @@ public class ChatController : ControllerBase
             return BadRequest(new { message = "Bad request" });
         }
 
-        var channel = await _context.ChatChannels.Include(x => x.Users).FirstOrDefaultAsync(x => x.Id == request.Id);
+        var channel = await _db.ChatChannels.Include(x => x.Users).FirstOrDefaultAsync(x => x.Id == request.Id);
 
         if (channel is null)
         {
@@ -126,7 +127,7 @@ public class ChatController : ControllerBase
         }
 
         channel.Users.Add(user);
-        await _context.SaveChangesAsync();
+        await _db.SaveChangesAsync();
 
         return Ok(new { message = "Channel joined", channel.Id, channel.Name });
     }
@@ -141,7 +142,7 @@ public class ChatController : ControllerBase
             return BadRequest(new { message = "Bad request" });
         }
 
-        var channel = await _context.ChatChannels.Include(x => x.Users).FirstOrDefaultAsync(x => x.Id == request.Id);
+        var channel = await _db.ChatChannels.Include(x => x.Users).FirstOrDefaultAsync(x => x.Id == request.Id);
 
         if (channel is null)
         {
@@ -154,7 +155,7 @@ public class ChatController : ControllerBase
         }
 
         channel.Users.Remove(user);
-        await _context.SaveChangesAsync();
+        await _db.SaveChangesAsync();
 
         return Ok(new { message = "Channel left", channel.Id, channel.Name });
     }

@@ -1,4 +1,4 @@
-﻿namespace TV_IDP.Access.Models
+﻿namespace TV_IDP.Access.Models.Chat
 {
     public class ChatChannel
     {

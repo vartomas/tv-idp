@@ -11,10 +11,10 @@ public class JwtMiddleware
         _next = next;
     }
 
-    public async Task Invoke(HttpContext context, IUserService userService, IJwtUtils jwtUtils)
+    public async Task Invoke(HttpContext context, IUserService userService, IJwt jwt)
     {
         var token = context.Request.Cookies["token"];
-        var userId = jwtUtils.ValidateJwtToken(token);
+        var userId = jwt.ValidateJwtToken(token);
         if (userId != null)
         {
             context.Items["User"] = await userService.GetById(userId.Value);

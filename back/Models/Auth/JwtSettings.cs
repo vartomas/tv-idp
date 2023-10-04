@@ -1,4 +1,4 @@
-﻿namespace TV_IDP.Helpers;
+﻿namespace TV_IDP.Models.Auth;
 
 public class JwtSettings
 {

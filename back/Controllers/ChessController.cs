@@ -11,17 +11,17 @@ namespace TV_IDP.Controllers;
 [Route("api/[controller]")]
 public class ChessController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly AppDbContext _db;
 
-    public ChessController(AppDbContext context)
+    public ChessController(AppDbContext db)
     {
-        _context = context;
+        _db = db;
     }
 
     [HttpGet(nameof(GetChessGameDetails))]
     public async Task<IActionResult> GetChessGameDetails(int gameId)
     {
-        var chessGame = await _context.ChessGames.FirstOrDefaultAsync(x => x.Id == gameId);
+        var chessGame = await _db.ChessGames.FirstOrDefaultAsync(x => x.Id == gameId);
 
         if (chessGame == null)
         {

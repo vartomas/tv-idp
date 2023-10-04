@@ -1,4 +1,5 @@
-﻿namespace TV_IDP.Models;
+﻿namespace TV_IDP.Models.Auth;
+
 using TV_IDP.Access.Models;
 
 public class AuthenticateResponse

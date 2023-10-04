@@ -88,7 +88,7 @@ export const useChat = () => {
   };
 
   useEffect(() => {
-    const newConnection = new HubConnectionBuilder().withUrl('/ws/chat').withAutomaticReconnect().build();
+    const newConnection = new HubConnectionBuilder().withUrl('/ws').withAutomaticReconnect().build();
     setConnection(newConnection);
   }, []);
 

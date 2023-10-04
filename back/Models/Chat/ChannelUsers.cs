@@ -1,4 +1,6 @@
-namespace TV_IDP.Models;
+using TV_IDP.Models.Hub;
+
+namespace TV_IDP.Models.Chat;
 
 public class ChannelUsers
 {

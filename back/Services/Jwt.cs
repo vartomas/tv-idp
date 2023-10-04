@@ -1,23 +1,24 @@
-﻿namespace TV_IDP.Authorization;
+﻿namespace TV_IDP.Services;
+
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TV_IDP.Access.Models;
-using TV_IDP.Helpers;
+using TV_IDP.Models.Auth;
 
-public interface IJwtUtils
+public interface IJwt
 {
     public string GenerateJwtToken(User user);
     public int? ValidateJwtToken(string? token);
 }
 
-public class JwtUtils : IJwtUtils
+public class Jwt : IJwt
 {
     private readonly JwtSettings _appSettings;
 
-    public JwtUtils(IOptions<JwtSettings> appSettings)
+    public Jwt(IOptions<JwtSettings> appSettings)
     {
         _appSettings = appSettings.Value;
 

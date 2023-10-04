@@ -1,6 +1,6 @@
-﻿namespace TV_IDP.Models
+﻿namespace TV_IDP.Models.Chat
 {
-    public enum MessageType
+    public enum ChatMessageType
     {
         Connected,
         Disconnected,

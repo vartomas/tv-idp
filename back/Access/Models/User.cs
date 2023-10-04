@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using TV_IDP.Access.Models.Chat;
 
 namespace TV_IDP.Access.Models
 {
