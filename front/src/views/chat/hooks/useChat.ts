@@ -1,12 +1,11 @@
-import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { useEffect, useState } from 'react';
 import { ChannelAction, ChannelDto, ChannelUsers, ConnectedUser, Message } from '../chatModel';
 import { leaveChannel, getChannels, getMessages, joinChannel, createChannel } from '../../../core/api/chat';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { InviteMessage } from '../../../components/chess/chessModel';
+import { useConnection } from '../../../core/state/useConnection';
 
 export const useChat = () => {
-  const [connection, setConnection] = useState<HubConnection | null>(null);
   const [connectedUsers, setConnectedUsers] = useState<Record<number, ConnectedUser[]>>({});
   const [currentChannelId, setCurrentChannelId] = useState(21);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -15,6 +14,7 @@ export const useChat = () => {
   const [joinChannelModalOpen, setJoinChannelModalOpen] = useState(false);
   const [currentGameId, setCurrentGameId] = useState<number | null>(null);
   const [receivedInvites, setReceivedInvites] = useState<InviteMessage[]>([]);
+  const connection = useConnection((state) => state.connection);
 
   const { isLoading: channelsLoading } = useQuery<ChannelDto[]>({
     queryKey: ['channels'],
@@ -88,34 +88,24 @@ export const useChat = () => {
   };
 
   useEffect(() => {
-    const newConnection = new HubConnectionBuilder().withUrl('/ws').withAutomaticReconnect().build();
-    setConnection(newConnection);
-  }, []);
-
-  useEffect(() => {
     if (connection) {
-      connection
-        .start()
-        .then(() => {
-          connection.on('ReceiveMessage', (data: Message) => {
-            setMessages((prev) => [...prev, data]);
-          });
-          connection.on('UserList', (data: ChannelUsers) => {
-            setConnectedUsers((prev) => {
-              return {
-                ...prev,
-                [data.channelId]: [...data.users.sort((a, b) => a.username.localeCompare(b.username))],
-              };
-            });
-          });
-          connection.on('ReceiveChessGameInvite', (message: InviteMessage) => {
-            setReceivedInvites((prev) => [...prev, message]);
-          });
-          connection.on('ReceiveChessGameAccept', (gameId: number) => {
-            setCurrentGameId(gameId);
-          });
-        })
-        .catch((err) => console.error(err));
+      connection.on('ReceiveMessage', (data: Message) => {
+        setMessages((prev) => [...prev, data]);
+      });
+      connection.on('UserList', (data: ChannelUsers) => {
+        setConnectedUsers((prev) => {
+          return {
+            ...prev,
+            [data.channelId]: [...data.users.sort((a, b) => a.username.localeCompare(b.username))],
+          };
+        });
+      });
+      connection.on('ReceiveChessGameInvite', (message: InviteMessage) => {
+        setReceivedInvites((prev) => [...prev, message]);
+      });
+      connection.on('ReceiveChessGameAccept', (gameId: number) => {
+        setCurrentGameId(gameId);
+      });
     }
 
     return () => {

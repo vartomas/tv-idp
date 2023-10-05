@@ -7,9 +7,12 @@ import Register from '../../views/Register';
 import ChatPage from '../../views/chat/ChatPage';
 import { useUser } from '../state/useUser';
 import PageNotFound from '../../views/PageNotFound';
+import { HubConnectionBuilder } from '@microsoft/signalr';
+import { useConnection } from '../state/useConnection';
 
 const Navigator = () => {
   const username = useUser((state) => state.username);
+  const setConnection = useConnection((state) => state.setConnection);
   const [initializing, setInitializing] = useState(true);
   const { initializeUser } = useAuth();
 
@@ -21,6 +24,18 @@ const Navigator = () => {
 
     checkUser();
   }, [initializeUser]);
+
+  useEffect(() => {
+    if (username) {
+      const newConnection = new HubConnectionBuilder().withUrl('/ws').withAutomaticReconnect().build();
+      newConnection
+        .start()
+        .then(() => {
+          setConnection(newConnection);
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [username, setConnection]);
 
   if (initializing) {
     return <Loader />;
