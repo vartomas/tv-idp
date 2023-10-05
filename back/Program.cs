@@ -44,5 +44,4 @@ app.UseMiddleware<JwtMiddleware>();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 app.MapHub<ConnectionHub>("/ws");
-
 app.Run();
