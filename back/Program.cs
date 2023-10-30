@@ -26,6 +26,7 @@ builder.Services.AddTransient<IAuthorizationHandler, SignalRJwtAuthorizationHand
 
 builder.Services.AddSingleton<Channels>();
 builder.Services.AddSingleton<Connections>();
+builder.Services.AddSingleton<ChessGames>();
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")

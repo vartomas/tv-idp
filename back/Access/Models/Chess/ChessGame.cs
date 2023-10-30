@@ -1,4 +1,6 @@
-﻿namespace TV_IDP.Access.Models.Chess;
+﻿using System.Text.Json.Serialization;
+
+namespace TV_IDP.Access.Models.Chess;
 
 public class ChessGame
 {
@@ -8,10 +10,6 @@ public class ChessGame
 
     public int BlackUserId { get; set; }
 
-    public int TurnUserId { get; set; }
-
     public int? WinnerUserId { get; set; } = null;
-
-    public bool Completed { get; set; } = false;
 }
 

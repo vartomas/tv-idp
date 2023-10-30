@@ -8,6 +8,11 @@ export type BoardRow = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 export type FigurePosition = [BoardColumn, BoardRow];
 
+export interface FigurePositionDto {
+  column: BoardColumn;
+  row: BoardRow;
+}
+
 export interface ChessFigure {
   type: FigureType;
   color: FigureColor;
@@ -33,4 +38,19 @@ export interface ChessGameDto {
 export interface InviteMessage {
   id: number;
   invitedBy: string;
+}
+
+export interface FigureMove {
+  from: FigurePosition;
+  to: FigurePosition;
+}
+
+export interface FigureMoveDto {
+  from: FigurePositionDto;
+  to: FigurePositionDto;
+}
+
+export interface GameStartMessage {
+  id: number;
+  currentTurn: boolean;
 }

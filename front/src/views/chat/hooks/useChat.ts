@@ -154,6 +154,7 @@ export const useChat = () => {
       connection.send('acceptGameInvite', gameId);
       setCurrentGameId(gameId);
     }
+    setReceivedInvites((prev) => prev.filter((x) => x.id !== gameId));
   };
 
   const handleCloseGameModal = () => {

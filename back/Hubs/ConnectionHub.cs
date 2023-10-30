@@ -6,6 +6,8 @@ using TV_IDP.Models.Hub;
 using TV_IDP.Services;
 using TV_IDP.Access.Models;
 using TV_IDP.Access.Models.Chat;
+using TV_IDP.Models.Chess;
+using TV_IDP.Utils;
 
 namespace TV_IDP.Hubs;
 
@@ -14,13 +16,15 @@ public sealed class ConnectionHub : Hub
 {
     private readonly AppDbContext _db;
     private readonly Channels _channels;
+    private readonly ChessGames _chessGames;
     private readonly Connections _connections;
     private readonly IUserService _users;
 
-    public ConnectionHub(AppDbContext db, Channels channels, Connections connections, IUserService users)
+    public ConnectionHub(AppDbContext db, Channels channels, ChessGames chessGames, Connections connections, IUserService users)
     {
         _db = db;
         _channels = channels;
+        _chessGames = chessGames;
         _connections = connections;
         _users = users;
     }
@@ -87,6 +91,37 @@ public sealed class ConnectionHub : Hub
         await Clients.Group(channelId.ToString()).SendAsync("ReceiveMessage", CreateChatMessage(ChatMessageType.UserMessage, channelId, message));
     }
 
+    public ChatMessageDto CreateChatMessage(ChatMessageType type, int channelId, string message = "")
+    {
+        var user = _users.GetCurrentHubUser(Context);
+        var newMessage = type switch
+        {
+            ChatMessageType.UserMessage => message,
+            ChatMessageType.Connected => $"{user.Username} has connected",
+            ChatMessageType.Disconnected => $"{user.Username} has disconnected",
+            ChatMessageType.JoinedChannel => $"{user.Username} has joined the channel",
+            ChatMessageType.LeftChannel => $"{user.Username} has left the channel",
+            _ => throw new Exception("Invalid message type"),
+        };
+
+        var messageType = type == ChatMessageType.UserMessage ? "message" : "info";
+
+        var chatMessage = new ChatMessage { Body = newMessage, ChannelId = channelId, UserId = user.Id, Type = messageType, CreatedAt = DateTime.Now };
+        _db.ChatMessages.Add(chatMessage);
+        _db.SaveChanges();
+
+        return new ChatMessageDto()
+        {
+            Id = chatMessage.Id,
+            Username = user.Username,
+            Body = newMessage,
+            Type = messageType,
+            ChannelId = channelId,
+        };
+    }
+
+    // chess games
+
     public async Task InviteForChessGame(int opponentId)
     {
         var currentUser = _users.GetCurrentHubUser(Context);
@@ -103,7 +138,7 @@ public sealed class ConnectionHub : Hub
         var chessGame = new ChessGame()
         {
             WhiteUserId = randomUser.Id,
-            BlackUserId = users[0].Id == randomUser.Id ? users[1].Id : users[0].Id,
+            BlackUserId = users[0].Id == randomUser.Id ? users[1].Id : users[0].Id
         };
 
         await _db.ChessGames.AddAsync(chessGame);
@@ -143,34 +178,45 @@ public sealed class ConnectionHub : Hub
         }
 
         await Clients.Client(opponentConnectionId).SendAsync("ReceiveChessGameAccept", chessGame.Id);
+
+        var liveGame = new LiveChessGame()
+        {
+            Id = chessGame.Id,
+            WhiteUserId = chessGame.WhiteUserId,
+            BlackUserId = chessGame.BlackUserId,
+            TurnUserId = chessGame.WhiteUserId
+        };
+
+        _chessGames.AddGame(liveGame);
+
+        var gameConnectionIds = _connections.GetConnections().FindAll((user) => user.Id == chessGame.WhiteUserId || user.Id == chessGame.BlackUserId).Select((user) => user.ConnectionId).ToList();
+
+        gameConnectionIds.ForEach(async (connectionId) =>
+        {
+            await Clients.Client(connectionId).SendAsync("ReceiveGameStart", new
+            {
+                liveGame.Id,
+                CurrentTurn = _connections.GetConnectedUser(connectionId)?.Id == liveGame.TurnUserId
+            });
+        });
     }
 
-    public ChatMessageDto CreateChatMessage(ChatMessageType type, int channelId, string message = "")
+    public async Task MakeMove(int gameId, ChessMoveDto move)
     {
-        var user = _users.GetCurrentHubUser(Context);
-        var newMessage = type switch
+        Console.WriteLine(gameId);
+        Console.Write(move);
+
+        try
         {
-            ChatMessageType.UserMessage => message,
-            ChatMessageType.Connected => $"{user.Username} has connected",
-            ChatMessageType.Disconnected => $"{user.Username} has disconnected",
-            ChatMessageType.JoinedChannel => $"{user.Username} has joined the channel",
-            ChatMessageType.LeftChannel => $"{user.Username} has left the channel",
-            _ => throw new Exception("Invalid message type"),
-        };
-
-        var messageType = type == ChatMessageType.UserMessage ? "message" : "info";
-
-        var chatMessage = new ChatMessage { Body = newMessage, ChannelId = channelId, UserId = user.Id, Type = messageType, CreatedAt = DateTime.Now };
-        _db.ChatMessages.Add(chatMessage);
-        _db.SaveChanges();
-
-        return new ChatMessageDto()
+            var currentUser = _users.GetCurrentHubUser(Context);
+            var chessGame = _chessGames.GetGame(gameId);
+            var opponentConnectionId = _connections.GetUserConnectionId(chessGame.WhiteUserId == currentUser.Id ? chessGame.BlackUserId : chessGame.WhiteUserId);
+            Console.WriteLine("opponentConnectionId", opponentConnectionId);
+            await Clients.Client(opponentConnectionId).SendAsync("ReceiveOpponentMove", move);
+        }
+        catch (CustomException ex)
         {
-            Id = chatMessage.Id,
-            Username = user.Username,
-            Body = newMessage,
-            Type = messageType,
-            ChannelId = channelId,
-        };
+            Console.WriteLine(ex.ToString());
+        }
     }
 }
