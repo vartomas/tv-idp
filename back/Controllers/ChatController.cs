@@ -2,7 +2,6 @@
 using TV_IDP.Authorization;
 using TV_IDP.Handlers.Chat;
 using TV_IDP.Models.Chat;
-using TV_IDP.Services;
 
 namespace TV_IDP.Controllers;
 
@@ -11,13 +10,6 @@ namespace TV_IDP.Controllers;
 [Route("api/[controller]")]
 public class ChatController : ControllerBase
 {
-    private readonly AppDbContext _db;
-
-    public ChatController(AppDbContext db)
-    {
-        _db = db;
-    }
-
     [HttpGet(nameof(GetChannels))]
     public async Task<IActionResult> GetChannels()
     {
