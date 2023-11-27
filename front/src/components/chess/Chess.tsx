@@ -49,8 +49,8 @@ const Chess: FC<Props> = ({ gameId, borderLength }) => {
                 key={`${col}-${row}`}
                 selected={!!selectedFigure && isSamePosition(selectedFigure.position, [col, row])}
                 position={[col, row]}
-                showPossibleMove={possibleMoves && possibleMoves.move.some((x) => isSamePosition(x, [col, row]))}
-                showPossibleCapture={possibleMoves && possibleMoves.capture.some((x) => isSamePosition(x, [col, row]))}
+                showPossibleMove={possibleMoves && possibleMoves.moves.some((x) => isSamePosition(x, [col, row]))}
+                showPossibleCapture={possibleMoves && possibleMoves.captures.some((x) => isSamePosition(x, [col, row]))}
                 onSelect={selectFigure}
                 onMove={moveFigure}
               >
