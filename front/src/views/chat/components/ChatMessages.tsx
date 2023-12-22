@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Message } from '../chatModel';
+import { Message } from '../chatTypes';
 import ChatMessage from './ChatMessage';
 import { useUser } from '../../../core/state/useUser';
 

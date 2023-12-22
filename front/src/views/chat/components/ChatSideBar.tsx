@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { ConnectedUser } from '../chatModel';
+import { ConnectedUser } from '../chatTypes';
 import UserListItem from './UserListItem';
 
 interface Props {

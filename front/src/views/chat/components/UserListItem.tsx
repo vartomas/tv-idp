@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { ConnectedUser } from '../chatModel';
+import { ConnectedUser } from '../chatTypes';
 import { RightOutlined } from '@ant-design/icons';
 import { Dropdown, MenuProps } from 'antd';
 import { useUser } from '../../../core/state/useUser';

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChannelAction, ChannelDto, ChannelUsers, ConnectedUser, Message } from '../chatModel';
+import { ChannelAction, ChannelDto, ChannelUsers, ConnectedUser, Message } from '../chatTypes';
 import { leaveChannel, getChannels, getMessages, joinChannel, createChannel } from '../../../core/api/chat';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { InviteMessage } from '../../../components/chess/chessModel';

@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Message } from '../chatModel';
+import { Message } from '../chatTypes';
 
 interface Props {
   message: Message;
