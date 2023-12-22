@@ -7,6 +7,7 @@ import ChatNavbar from './components/ChatNavbar';
 import Loader from '../Loader';
 import CreateChannelModal from './components/CreateChannelModal';
 import JoinChannelModal from './components/JoinChannelModal';
+import GameModal from '../../components/GameModal';
 
 const ChatPage = () => {
   const {
@@ -20,13 +21,18 @@ const ChatPage = () => {
     connectedUsers,
     createChannelModalOpen,
     joinChannelModalOpen,
+    currentGameId,
+    receivedInvites,
     sendMessage,
     setCurrentChannelId,
     onLeaveChannel,
     onCreateChannel,
     onJoinChannel,
+    onInviteChess,
+    onAcceptInvite,
     setCreateChannelModalOpen,
     setJoinChannelModalOpen,
+    onGameModalClose,
   } = useChat();
 
   if (initializing) {
@@ -40,15 +46,17 @@ const ChatPage = () => {
           leavingChannel={leavingChannel}
           currentChannelId={currentChannelId}
           availableChannels={availableChannels}
+          receivedInvites={receivedInvites}
           setCurrentChannelId={setCurrentChannelId}
           onLeave={onLeaveChannel}
           onOpenCreateChannelModal={setCreateChannelModalOpen}
           onOpenJoinChannelModal={setJoinChannelModalOpen}
+          onAcceptInvite={onAcceptInvite}
         />
       </div>
       <Row style={{ height: 'calc(100% - 40px)' }}>
         <Col span={3}>
-          <ChatSideBar connectedUsers={connectedUsers[currentChannelId] || []} />
+          <ChatSideBar connectedUsers={connectedUsers[currentChannelId] || []} onInviteChess={onInviteChess} />
         </Col>
         <Col span={21} className="h-full">
           <div className="w-full pt-auto overflow-auto" style={{ height: 'calc(100% - 92px)' }} id="messagesContainer">
@@ -74,6 +82,7 @@ const ChatPage = () => {
         onJoin={onJoinChannel}
         onOpenChange={setJoinChannelModalOpen}
       />
+      {currentGameId && <GameModal gameId={currentGameId} onClose={onGameModalClose} />}
     </div>
   );
 };

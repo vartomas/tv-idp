@@ -1,8 +1,9 @@
 ﻿namespace TV_IDP.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
 using TV_IDP.Authorization;
 using TV_IDP.Services;
-using TV_IDP.Models;
+using TV_IDP.Models.Auth;
 using TV_IDP.Access.Models;
 
 [ApiController]
@@ -10,18 +11,18 @@ using TV_IDP.Access.Models;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IUserService _users;
 
-    public UsersController(IUserService userService)
+    public UsersController(IUserService users)
     {
-        _userService = userService;
+        _users = users;
     }
 
     [AllowAnonymous]
     [HttpPost(nameof(Register))]
     public async Task<IActionResult> Register(AuthRequest request)
     {
-        var response = await _userService.Create(request);
+        var response = await _users.Create(request);
         if (response == null)
         {
             return BadRequest(new { message = "Username already exists" });
@@ -40,7 +41,7 @@ public class UsersController : ControllerBase
     [HttpPost(nameof(Login))]
     public async Task<IActionResult> Login(AuthRequest request)
     {
-        var response = await _userService.LogIn(request);
+        var response = await _users.LogIn(request);
         if (response == null)
             return BadRequest(new { message = "Username or password is incorrect" });
 

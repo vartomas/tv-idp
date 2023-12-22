@@ -37,7 +37,7 @@ namespace TV_IDP.Migrations
                     b.ToTable("ChatChannelUser");
                 });
 
-            modelBuilder.Entity("TV_IDP.Access.Models.ChatChannel", b =>
+            modelBuilder.Entity("TV_IDP.Access.Models.Chat.ChatChannel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -57,7 +57,7 @@ namespace TV_IDP.Migrations
                     b.ToTable("ChatChannels");
                 });
 
-            modelBuilder.Entity("TV_IDP.Access.Models.ChatMessage", b =>
+            modelBuilder.Entity("TV_IDP.Access.Models.Chat.ChatMessage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,6 +91,34 @@ namespace TV_IDP.Migrations
                     b.ToTable("ChatMessages");
                 });
 
+            modelBuilder.Entity("TV_IDP.Access.Models.Chess.ChessGame", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BlackUserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Completed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TurnUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WhiteUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("WinnerUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChessGames");
+                });
+
             modelBuilder.Entity("TV_IDP.Access.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -114,7 +142,7 @@ namespace TV_IDP.Migrations
 
             modelBuilder.Entity("ChatChannelUser", b =>
                 {
-                    b.HasOne("TV_IDP.Access.Models.ChatChannel", null)
+                    b.HasOne("TV_IDP.Access.Models.Chat.ChatChannel", null)
                         .WithMany()
                         .HasForeignKey("ChannelsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -127,9 +155,9 @@ namespace TV_IDP.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TV_IDP.Access.Models.ChatMessage", b =>
+            modelBuilder.Entity("TV_IDP.Access.Models.Chat.ChatMessage", b =>
                 {
-                    b.HasOne("TV_IDP.Access.Models.ChatChannel", "Channel")
+                    b.HasOne("TV_IDP.Access.Models.Chat.ChatChannel", "Channel")
                         .WithMany("Messages")
                         .HasForeignKey("ChannelId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -146,7 +174,7 @@ namespace TV_IDP.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TV_IDP.Access.Models.ChatChannel", b =>
+            modelBuilder.Entity("TV_IDP.Access.Models.Chat.ChatChannel", b =>
                 {
                     b.Navigation("Messages");
                 });

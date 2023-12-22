@@ -1,29 +1,35 @@
 import { Avatar, Button, Dropdown, MenuProps, Select } from 'antd';
 import { useUser } from '../../../core/state/useUser';
 import { useAuth } from '../../../core/hooks/useAuth';
-import { ChannelAction, ChannelDto } from '../ChatModel';
+import { ChannelAction, ChannelDto } from '../chatModel';
 import { FC } from 'react';
 import { UseMutateFunction } from '@tanstack/react-query';
 import { MoreOutlined } from '@ant-design/icons';
+import ReceivedInvites from './ReceivedInvites';
+import { InviteMessage } from '../../../components/chess/chessModel';
 
 interface Props {
   leavingChannel: boolean;
   currentChannelId: number;
   availableChannels: ChannelDto[];
+  receivedInvites: InviteMessage[];
   setCurrentChannelId: React.Dispatch<React.SetStateAction<number>>;
   onLeave: UseMutateFunction<ChannelAction, unknown, number, unknown>;
   onOpenCreateChannelModal: React.Dispatch<React.SetStateAction<boolean>>;
   onOpenJoinChannelModal: React.Dispatch<React.SetStateAction<boolean>>;
+  onAcceptInvite: (gameId: number) => void;
 }
 
 const ChatNavbar: FC<Props> = ({
   leavingChannel,
   currentChannelId,
   availableChannels,
+  receivedInvites,
   setCurrentChannelId,
   onLeave,
   onOpenCreateChannelModal,
   onOpenJoinChannelModal,
+  onAcceptInvite,
 }) => {
   const username = useUser((state) => state.username);
   const { logout } = useAuth();
@@ -85,7 +91,8 @@ const ChatNavbar: FC<Props> = ({
         </Dropdown>
       </div>
       <div>
-        <span className="text-blue-600">{username}</span>
+        <ReceivedInvites invites={receivedInvites} onAccept={onAcceptInvite} />
+        <span className="text-blue-600 ml-6">{username}</span>
         <Dropdown menu={{ items: avatarMenuItems }} placement="bottomRight" trigger={['click']}>
           <Avatar size="small" className="bg-blue-600 ml-2 cursor-pointer select-none">
             {username[0]}

@@ -5,13 +5,13 @@ namespace TV_IDP.Authorization;
 
 public class SignalRJwtAuthorizationHandler : AuthorizationHandler<SignalRJwtRequirement>
 {
-    private readonly IUserService _userService;
-    private readonly IJwtUtils _jwtUtils;
+    private readonly IUserService _users;
+    private readonly IJwt _jwt;
 
-    public SignalRJwtAuthorizationHandler(IUserService userService, IJwtUtils jwtUtils)
+    public SignalRJwtAuthorizationHandler(IUserService users, IJwt jwt)
     {
-        _userService = userService;
-        _jwtUtils = jwtUtils;
+        _users = users;
+        _jwt = jwt;
     }
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, SignalRJwtRequirement requirement)
@@ -24,11 +24,11 @@ public class SignalRJwtAuthorizationHandler : AuthorizationHandler<SignalRJwtReq
         }
 
         var token = httpContext.Request.Cookies["token"];
-        var userId = _jwtUtils.ValidateJwtToken(token);
+        var userId = _jwt.ValidateJwtToken(token);
 
         if (userId != null)
         {
-            httpContext.Items["User"] = await _userService.GetById(userId.Value);
+            httpContext.Items["User"] = await _users.GetById(userId.Value);
             context.Succeed(requirement);
         }
         else

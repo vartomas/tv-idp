@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using TV_IDP.Authorization;
-using TV_IDP.Helpers;
 using TV_IDP.Services;
 using TV_IDP.Hubs;
+using TV_IDP.Models.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +20,13 @@ builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTION_STRING");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
-builder.Services.AddTransient<IJwtUtils, JwtUtils>();
-builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IJwt, Jwt>();
+builder.Services.AddTransient<IUserService, Users>();
 builder.Services.AddTransient<IAuthorizationHandler, SignalRJwtAuthorizationHandler>();
+
+builder.Services.AddSingleton<Channels>();
+builder.Services.AddSingleton<Connections>();
+builder.Services.AddSingleton<ChessGames>();
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -35,10 +39,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseAuthorization();
+
 app.UseMiddleware<JwtMiddleware>();
 
 app.MapControllers();
 app.MapFallbackToFile("index.html");
-app.MapHub<ChatHub>("/ws/chat");
-
+app.MapHub<ConnectionHub>("/ws");
 app.Run();
